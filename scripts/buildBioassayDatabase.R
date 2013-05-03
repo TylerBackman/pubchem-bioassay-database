@@ -15,8 +15,8 @@ registerDoParallel(cl)
 bioassayMirror = commandArgs(trailingOnly=TRUE)[1]
 outputDatabase = commandArgs(trailingOnly=TRUE)[2]
 
-bioassayMirror <- "working/bioassayMirror_test" # TEST CODE
-outputDatabase <- "working/bioassayDatabase_test.sqlite" # TEST CODE
+# bioassayMirror <- "working/bioassayMirror_test" # TEST CODE
+# outputDatabase <- "working/bioassayDatabase_test.sqlite" # TEST CODE
 
 # this function returns the path of each assay file within a given folder name
 getAssayPaths <- function(path) {
@@ -38,21 +38,19 @@ assaypaths <- getAssayPaths(file.path(bioassayMirror, "Data"))
 for(assaypath in assaypaths){
     aid <- as.integer(gsub("^.*?(\\d+)\\.concise\\.csv.*$", "\\1", assaypath, perl = TRUE))
     print(paste("inserting activity for assay", aid))
-    tempAssay <- read.csv(assaypath)
-    tempAssay <- tempAssay[,c(1, 3, 4, 5)]
-    tempAssay <- cbind(PUBCHEM_AID=aid, tempAssay)
-    sql <- "INSERT INTO activity VALUES ($PUBCHEM_AID, $PUBCHEM_SID, $PUBCHEM_CID, $PUBCHEM_ACTIVITY_OUTCOME, $PUBCHEM_ACTIVITY_SCORE)"
+    tempAssay <- read.csv(assaypath)[,c(1, 3, 4, 5)]
+    sql <- paste("INSERT INTO activity VALUES (", aid, ", $PUBCHEM_SID, $PUBCHEM_CID, $PUBCHEM_ACTIVITY_OUTCOME, $PUBCHEM_ACTIVITY_SCORE)", sep="")
     dbBeginTransaction(con)
     dbGetPreparedQuery(con, sql, bind.data = tempAssay)
     dbCommit(con)
 }
 
 # parse assay descriptions from XML files
+print("parsing XML from each assay")
 assaypaths <- getAssayPaths(file.path(bioassayMirror, "Description"))
 parsedTable <- foreach(assaypath=assaypaths, .combine='rbind') %dopar% {
     library(XML)
     aid <- as.integer(gsub("^.*?(\\d+)\\.concise.descr\\.xml.*$", "\\1", assaypath, perl = TRUE))
-    print(paste("parsing XML for assay", aid))
     desc <- xmlTreeParse(assaypath)
     target <- desc[[1]][["PC-AssayContainer"]][["PC-AssaySubmit"]][["PC-AssaySubmit_assay"]][["PC-AssaySubmit_assay_descr"]][["PC-AssayDescription"]][["PC-AssayDescription_target"]][["PC-AssayTargetInfo"]][["PC-AssayTargetInfo_mol-id"]]
     if(! is.null(target)){
@@ -84,6 +82,7 @@ parsedTable <- foreach(assaypath=assaypaths, .combine='rbind') %dopar% {
 }
 
 # insert assay data into database
+print("loading assay data into database")
 colnames(parsedTable) <- c("AID", "TARGETS", "TARGET_TYPE", "ASSAY_TYPE", "ORGANISM")
 parsedTable <- as.data.frame(parsedTable)
 sql <- "INSERT INTO assays VALUES (1, $AID, $TARGETS, $TARGET_TYPE, $ASSAY_TYPE, $ORGANISM)"
@@ -92,7 +91,10 @@ dbGetPreparedQuery(con, sql, bind.data = parsedTable)
 dbCommit(con)
 
 # example use query
-dbGetQuery(con, "SELECT * FROM activity LIMIT 10")
+# dbGetQuery(con, "SELECT * FROM activity LIMIT 10")
+
+# mention source
+dbGetQuery(con, paste("INSERT into sources VALUES (NULL, \"PubChem Bioassay\", \"", date(), "\")", sep=""))
 
 # disconnect:
 dbDisconnect(con)
