@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Purpose: makes a mirror of pubchem bioassay in the current working directory
+# Purpose: makes a mirror of pubchem bioassay in the specified folder 
 # (C) 2013 Tyler WH Backman
 
 cd $1
@@ -20,4 +20,3 @@ rm -f *.zip
 cd ../Description
 unzip "*.zip"
 rm -f *.zip
-cd ..

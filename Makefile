@@ -7,7 +7,7 @@ working:
 	mkdir $@
 
 working/bioassayMirror: scripts/mirrorBioassay.sh working
-	mkdir working/bioassayMirror
+	mkdir $@
 	$^/bioassayMirror
 	
 working/bioassayDatabase.sqlite: scripts/buildBioassayDatabase.R working/bioassayMirror
