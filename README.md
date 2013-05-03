@@ -1,4 +1,4 @@
 bioassay-investigation
 ======================
 
-Investingating public bioassay data
+investigating public bioassay data
