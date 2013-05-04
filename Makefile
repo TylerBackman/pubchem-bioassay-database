@@ -12,4 +12,4 @@ working/bioassayDatabase.sqlite: scripts/buildBioassayDatabase.R working/bioassa
 
 working/indexedBioassayDatabase.sqlite: scripts/addDatabaseIndex.R working/bioassayDatabase.sqlite
 	cp working/bioassayDatabase.sqlite $@
-	scripts/addDatabaseIndex.R $@ 
+	$< $@ 
