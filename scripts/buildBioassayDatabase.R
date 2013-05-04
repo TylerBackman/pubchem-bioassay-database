@@ -30,7 +30,7 @@ dbGetQuery(con, "CREATE TABLE activity (aid INTEGER, sid INTEGER, cid INTEGER, a
 
 # loop through assay CSVs and load them into the database
 assaypaths <- getAssayPaths(file.path(bioassayMirror, "Data"))
-lapply(assaypaths, function(assaypath)){
+lapply(assaypaths, function(assaypath){
     aid <- as.integer(gsub("^.*?(\\d+)\\.concise\\.csv.*$", "\\1", assaypath, perl = TRUE))
     print(paste("inserting activity for assay", aid))
     tempAssay <- read.csv(assaypath)[,c(1, 3, 4, 5)]
@@ -42,7 +42,7 @@ lapply(assaypaths, function(assaypath)){
 
 # parse assay descriptions from XML files
 assaypaths <- getAssayPaths(file.path(bioassayMirror, "Description"))
-lapply(assaypaths, function(assaypath)){
+lapply(assaypaths, function(assaypath){
     aid <- as.integer(gsub("^.*?(\\d+)\\.concise.descr\\.xml.*$", "\\1", assaypath, perl = TRUE))
     print(paste("inserting XML details for assay", aid))
     desc <- xmlTreeParse(assaypath)
