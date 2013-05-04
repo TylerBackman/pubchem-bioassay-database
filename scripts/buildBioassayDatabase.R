@@ -5,12 +5,7 @@
 
 library(R.utils)
 library(RSQLite)
-library(foreach)
-# library(doMC)
 library(XML)
-
-# setup multiprocessing options
-# registerDoMC(cores=8)
 
 bioassayMirror = commandArgs(trailingOnly=TRUE)[1]
 outputDatabase = commandArgs(trailingOnly=TRUE)[2]
@@ -46,11 +41,10 @@ for(assaypath in assaypaths){
 }
 
 # parse assay descriptions from XML files
-print("parsing XML from each assay")
 assaypaths <- getAssayPaths(file.path(bioassayMirror, "Description"))
-parsedTable <- foreach(assaypath=assaypaths, .combine='rbind') %dopar% {
-    library(XML)
+for(assaypath in assaypaths){
     aid <- as.integer(gsub("^.*?(\\d+)\\.concise.descr\\.xml.*$", "\\1", assaypath, perl = TRUE))
+    print(paste("inserting XML details for assay", aid))
     desc <- xmlTreeParse(assaypath)
     target <- desc[[1]][["PC-AssayContainer"]][["PC-AssaySubmit"]][["PC-AssaySubmit_assay"]][["PC-AssaySubmit_assay_descr"]][["PC-AssayDescription"]][["PC-AssayDescription_target"]][["PC-AssayTargetInfo"]][["PC-AssayTargetInfo_mol-id"]]
     if(! is.null(target)){
@@ -78,23 +72,20 @@ parsedTable <- foreach(assaypath=assaypaths, .combine='rbind') %dopar% {
     } else {
         organism <- NA
     }
-    c(aid, target, targetType, assayType, organism)
+    parsedTable <- cbind(aid, target, targetType, assayType, organism)
+    colnames(parsedTable) <- c("AID", "TARGETS", "TARGET_TYPE", "ASSAY_TYPE", "ORGANISM")
+    parsedTable <- as.data.frame(parsedTable)
+    sql <- "INSERT INTO assays VALUES (1, $AID, $TARGETS, $TARGET_TYPE, $ASSAY_TYPE, $ORGANISM)"
+    dbBeginTransaction(con)
+    dbGetPreparedQuery(con, sql, bind.data = parsedTable)
+    dbCommit(con)
 }
-
-# insert assay data into database
-print("loading assay data into database")
-colnames(parsedTable) <- c("AID", "TARGETS", "TARGET_TYPE", "ASSAY_TYPE", "ORGANISM")
-parsedTable <- as.data.frame(parsedTable)
-sql <- "INSERT INTO assays VALUES (1, $AID, $TARGETS, $TARGET_TYPE, $ASSAY_TYPE, $ORGANISM)"
-dbBeginTransaction(con)
-dbGetPreparedQuery(con, sql, bind.data = parsedTable)
-dbCommit(con)
 
 # example use query
 # dbGetQuery(con, "SELECT * FROM activity LIMIT 10")
 
 # mention source
-dbGetQuery(con, paste("INSERT into sources VALUES (NULL, \"PubChem Bioassay\", \"", date(), "\")", sep=""))
+dbGetQuery(con, paste("INSERT INTO sources VALUES (NULL, \"PubChem Bioassay\", \"", date(), "\")", sep=""))
 
 # disconnect:
 dbDisconnect(con)
