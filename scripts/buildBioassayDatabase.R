@@ -6,11 +6,11 @@
 library(R.utils)
 library(RSQLite)
 library(foreach)
-library(doMC)
+# library(doMC)
 library(XML)
 
 # setup multiprocessing options
-registerDoMC(cores=8)
+# registerDoMC(cores=8)
 
 bioassayMirror = commandArgs(trailingOnly=TRUE)[1]
 outputDatabase = commandArgs(trailingOnly=TRUE)[2]
