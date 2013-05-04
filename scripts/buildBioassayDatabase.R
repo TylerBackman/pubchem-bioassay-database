@@ -30,7 +30,7 @@ dbGetQuery(con, "CREATE TABLE activity (aid INTEGER, sid INTEGER, cid INTEGER, a
 
 # loop through assay CSVs and load them into the database
 assaypaths <- getAssayPaths(file.path(bioassayMirror, "Data"))
-for(assaypath in assaypaths){
+lapply(assaypaths, function(assaypath)){
     aid <- as.integer(gsub("^.*?(\\d+)\\.concise\\.csv.*$", "\\1", assaypath, perl = TRUE))
     print(paste("inserting activity for assay", aid))
     tempAssay <- read.csv(assaypath)[,c(1, 3, 4, 5)]
@@ -38,11 +38,11 @@ for(assaypath in assaypaths){
     dbBeginTransaction(con)
     dbGetPreparedQuery(con, sql, bind.data = tempAssay)
     dbCommit(con)
-}
+})
 
 # parse assay descriptions from XML files
 assaypaths <- getAssayPaths(file.path(bioassayMirror, "Description"))
-for(assaypath in assaypaths){
+lapply(assaypaths, function(assaypath)){
     aid <- as.integer(gsub("^.*?(\\d+)\\.concise.descr\\.xml.*$", "\\1", assaypath, perl = TRUE))
     print(paste("inserting XML details for assay", aid))
     desc <- xmlTreeParse(assaypath)
@@ -79,7 +79,7 @@ for(assaypath in assaypaths){
     dbBeginTransaction(con)
     dbGetPreparedQuery(con, sql, bind.data = parsedTable)
     dbCommit(con)
-}
+})
 
 # example use query
 # dbGetQuery(con, "SELECT * FROM activity LIMIT 10")
