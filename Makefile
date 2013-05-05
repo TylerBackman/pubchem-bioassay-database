@@ -10,9 +10,9 @@ working/bioassayMirror: scripts/mirrorBioassay.sh
 working/bioassayDatabase.sqlite: scripts/buildBioassayDatabase.R working/bioassayMirror
 	$^ $@
 
-working/bioassayDatabaseWithAssayDetails.sqlite: scripts/addAssayDetails.R working/bioassayMirror scripts/parseBioassayXML.R working/bioassayDatabase.sqlite
+working/bioassayDatabaseWithAssayDetails.sqlite: scripts/addAssayDetails.R working/bioassayMirror working/bioassayDatabase.sqlite
 	cp working/bioassayDatabase.sqlite $@
-	$< working/bioassayMirror scripts/parseBioassayXML.R $@
+	$< working/bioassayMirror $@
 
 working/indexedBioassayDatabase.sqlite: scripts/addDatabaseIndex.R working/bioassayDatabaseWithAssayDetails.sqlite
 	cp working/bioassayDatabaseWithAssayDetails.sqlite $@
