@@ -28,13 +28,13 @@ parsedTable <- t(sapply(assaypaths, function(assaypath){
     desc <- xmlRoot(xmlPointer, addFinalizer = TRUE)
     free(xmlPointer)
 
-    target <- desc[[1]][["PC-AssayContainer"]][["PC-AssaySubmit"]][["PC-AssaySubmit_assay"]][["PC-AssaySubmit_assay_descr"]][["PC-AssayDescription"]][["PC-AssayDescription_target"]][["PC-AssayTargetInfo"]][["PC-AssayTargetInfo_mol-id"]]
+    target <- desc[[1]][["PC-AssaySubmit_assay"]][["PC-AssaySubmit_assay_descr"]][["PC-AssayDescription"]][["PC-AssayDescription_target"]][["PC-AssayTargetInfo"]][["PC-AssayTargetInfo_mol-id"]]
     if(! is.null(target)){
         target <- xmlToList(target)[[1]]
     } else {
         target <- NA
     }
-    targetType <- desc[[1]][["PC-AssayContainer"]][["PC-AssaySubmit"]][["PC-AssaySubmit_assay"]][["PC-AssaySubmit_assay_descr"]][["PC-AssayDescription"]][["PC-AssayDescription_target"]][["PC-AssayTargetInfo"]][["PC-AssayTargetInfo_molecule-type"]]
+    targetType <- desc[[1]][["PC-AssaySubmit_assay"]][["PC-AssaySubmit_assay_descr"]][["PC-AssayDescription"]][["PC-AssayDescription_target"]][["PC-AssayTargetInfo"]][["PC-AssayTargetInfo_molecule-type"]]
     if(! is.null(targetType)){
         targetType <- xmlToList(targetType)$.attrs[["value"]]
     } else if(! is.na(target)){
@@ -42,13 +42,13 @@ parsedTable <- t(sapply(assaypaths, function(assaypath){
     } else {
         targetType <- NA
     }
-    assayType <- desc[[1]][["PC-AssayContainer"]][["PC-AssaySubmit"]][["PC-AssaySubmit_assay"]][["PC-AssaySubmit_assay_descr"]][["PC-AssayDescription"]][["PC-AssayDescription_activity-outcome-method"]]
+    assayType <- desc[[1]][["PC-AssaySubmit_assay"]][["PC-AssaySubmit_assay_descr"]][["PC-AssayDescription"]][["PC-AssayDescription_activity-outcome-method"]]
     if(! is.null(assayType)){
         assayType <- xmlToList(assayType)$.attrs[["value"]]
     } else {
         assayType <- NA
     }
-    organism <- desc[[1]][["PC-AssayContainer"]][["PC-AssaySubmit"]][["PC-AssaySubmit_assay"]][["PC-AssaySubmit_assay_descr"]][["PC-AssayDescription"]][["PC-AssayDescription_target"]][["PC-AssayTargetInfo"]][["PC-AssayTargetInfo_organism"]][["BioSource"]][["BioSource_org"]][["Org-ref"]][["Org-ref_orgname"]][["OrgName"]][["OrgName_name"]][["OrgName_name_binomial"]][["BinomialOrgName"]][["BinomialOrgName_genus"]]  
+    organism <- desc[[1]][["PC-AssaySubmit_assay"]][["PC-AssaySubmit_assay_descr"]][["PC-AssayDescription"]][["PC-AssayDescription_target"]][["PC-AssayTargetInfo"]][["PC-AssayTargetInfo_organism"]][["BioSource"]][["BioSource_org"]][["Org-ref"]][["Org-ref_orgname"]][["OrgName"]][["OrgName_name"]][["OrgName_name_binomial"]][["BinomialOrgName"]][["BinomialOrgName_genus"]]  
     if(! is.null(organism)){
         organism <- xmlToList(organism)[[1]]
     } else {
