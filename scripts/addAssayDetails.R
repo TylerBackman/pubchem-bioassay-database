@@ -9,6 +9,7 @@ library(XML)
 
 bioassayMirror = commandArgs(trailingOnly=TRUE)[1]
 outputDatabase = commandArgs(trailingOnly=TRUE)[2]
+bioassayMirror <- "working/bioassayMirror_test"
 
 # this function returns the path of each assay file within a given folder name
 getAssayPaths <- function(path) {
@@ -18,14 +19,11 @@ getAssayPaths <- function(path) {
     list.files(assaydirs, full.names = TRUE)
 }
 
-drv <- dbDriver("SQLite")
-con <- dbConnect(drv, dbname=outputDatabase)
-
 # parse assay descriptions from XML files
 assaypaths <- getAssayPaths(file.path(bioassayMirror, "Description"))
-lapply(assaypaths, function(assaypath){
+parsedTable <- t(sapply(assaypaths, function(assaypath){
     aid <- as.integer(gsub("^.*?(\\d+)\\.concise.descr\\.xml.*$", "\\1", assaypath, perl = TRUE))
-    print(paste("inserting XML details for assay", aid))
+    print(paste("parsing XML details for assay", aid))
 
     xmlPointer <- xmlTreeParse(assaypath, useInternalNodes=TRUE, addFinalizer=TRUE)
     desc <- xmlRoot(xmlPointer, addFinalizer = TRUE)
@@ -57,13 +55,18 @@ lapply(assaypaths, function(assaypath){
     } else {
         organism <- NA
     }
-    parsedTable <- cbind(aid, target, targetType, assayType, organism)
-    colnames(parsedTable) <- c("AID", "TARGETS", "TARGET_TYPE", "ASSAY_TYPE", "ORGANISM")
-    parsedTable <- as.data.frame(parsedTable)
-    sql <- "INSERT INTO assays VALUES (1, $AID, $TARGETS, $TARGET_TYPE, $ASSAY_TYPE, $ORGANISM)"
-    dbBeginTransaction(con)
-    dbGetPreparedQuery(con, sql, bind.data = parsedTable)
-    dbCommit(con)
-})
+    cbind(aid, target, targetType, assayType, organism)
+}))
+
+print("loading results into database")
+drv <- dbDriver("SQLite")
+con <- dbConnect(drv, dbname=outputDatabase)
+
+colnames(parsedTable) <- c("AID", "TARGETS", "TARGET_TYPE", "ASSAY_TYPE", "ORGANISM")
+parsedTable <- as.data.frame(parsedTable)
+sql <- "INSERT INTO assays VALUES (1, $AID, $TARGETS, $TARGET_TYPE, $ASSAY_TYPE, $ORGANISM)"
+dbBeginTransaction(con)
+dbGetPreparedQuery(con, sql, bind.data = parsedTable)
+dbCommit(con)
 
 dbDisconnect(con)
