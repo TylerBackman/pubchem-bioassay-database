@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 # (C) 2013 Tyler WH Backman
-# Purpose: build a bioassay SQLite database from a downloaded mirror
+# Purpose: add XML assay details to a bioassay SQLite database from a downloaded mirror
 
 library(R.utils)
 library(RSQLite)
@@ -9,7 +9,6 @@ library(XML)
 
 bioassayMirror = commandArgs(trailingOnly=TRUE)[1]
 outputDatabase = commandArgs(trailingOnly=TRUE)[2]
-bioassayMirror <- "working/bioassayMirror_test"
 
 # this function returns the path of each assay file within a given folder name
 getAssayPaths <- function(path) {
