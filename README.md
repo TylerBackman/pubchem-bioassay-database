@@ -1,4 +1,4 @@
-bioassay-investigation
+PubChem Bioassay Database
 ======================
 
-investigating public bioassay data
+Downloads data from PubChem Bioassay, and loads it into a SQLite database
