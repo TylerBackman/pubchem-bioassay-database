@@ -20,6 +20,8 @@ getAssayPaths <- function(path) {
 
 # parse assay descriptions from XML files
 assaypaths <- getAssayPaths(file.path(bioassayMirror, "Description"))
+aids <- as.integer(gsub("^.*?(\\d+)\\.concise.descr\\.xml.*$", "\\1", assaypaths, perl = TRUE))
+assaypaths <- assaypaths[! duplicated(aids)] 
 parsedTable <- t(sapply(assaypaths, function(assaypath){
     aid <- as.integer(gsub("^.*?(\\d+)\\.concise.descr\\.xml.*$", "\\1", assaypath, perl = TRUE))
     print(paste("parsing XML details for assay", aid))

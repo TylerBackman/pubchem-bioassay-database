@@ -29,6 +29,8 @@ dbGetQuery(con, "CREATE TABLE activity (aid INTEGER, sid INTEGER, cid INTEGER, a
 
 # loop through assay CSVs and load them into the database
 assaypaths <- getAssayPaths(file.path(bioassayMirror, "Data"))
+aids <- as.integer(gsub("^.*?(\\d+)\\.concise\\.csv.*$", "\\1", assaypaths, perl = TRUE))
+assaypaths <- assaypaths[! duplicated(aids)]
 for(assaypath in assaypaths){
     aid <- as.integer(gsub("^.*?(\\d+)\\.concise\\.csv.*$", "\\1", assaypath, perl = TRUE))
     print(paste("inserting activity for assay", aid))
