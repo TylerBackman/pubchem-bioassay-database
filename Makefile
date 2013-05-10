@@ -26,9 +26,11 @@ working/Pfam-A.hmm:
 	gunzip $@.gz
 	hmmpress $@
 
-working/domainsFromHmmscanTwoCols: working/Pfam-A.hmm working/targets.fasta
+working/domainsFromHmmscan: working/Pfam-A.hmm working/targets.fasta
 	hmmscan --tblout working/domainsFromHmmscan --cpu 8 --noali $^
-	awk '{print $2 \" \" $3}' working/domainsFromHmmscan > $@ 
+
+working/domainsFromHmmscanTwoCols: working/domainsFromHmmscan
+	awk '{print $$2 " " $$3}' $^ > $@
 
 working/bioassayDatabaseWithDomains.sqlite: scripts/loadDomainData.R working/targets.fasta working/domainsFromHmmscanTwoCols working/indexedBioassayDatabase.sqlite
 	cp working/indexedBioassayDatabase.sqlite $@
