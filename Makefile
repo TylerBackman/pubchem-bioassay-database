@@ -24,7 +24,7 @@ working/targets.fasta: working/indexedBioassayDatabase.sqlite
 working/Pfam-A.hmm:
 	wget -O $@.gz ftp://ftp.sanger.ac.uk/pub/databases/Pfam/releases/Pfam27.0/Pfam-A.hmm.gz
 	gunzip $@.gz
-	hmmpress hmmpress $@
+	hmmpress $@
 
 working/domainsFromHmmscanTwoCols: working/Pfam-A.hmm working/targets.fasta
 	hmmscan --tblout working/domainsFromHmmscan --cpu 8 --noali $^
