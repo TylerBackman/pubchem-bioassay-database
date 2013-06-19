@@ -36,7 +36,7 @@ assaypaths <- assaypaths[! duplicated(aids)]
 for(assaypath in assaypaths){
     aid <- as.integer(gsub("^.*?(\\d+)\\.concise\\.csv.*$", "\\1", assaypath, perl = TRUE))
     print(paste("inserting activity for assay", aid))
-    tempAssay <- read.csv(assaypath)[,c(1, 3, 4, 5)]
+    tempAssay <- read.csv(assaypath)[,c(1, 2, 3, 4)]
     sql <- paste("INSERT INTO activity VALUES (", aid, ", $PUBCHEM_SID, $PUBCHEM_CID, $PUBCHEM_ACTIVITY_OUTCOME, $PUBCHEM_ACTIVITY_SCORE)", sep="")
     dbBeginTransaction(con)
     dbGetPreparedQuery(con, sql, bind.data = tempAssay)
