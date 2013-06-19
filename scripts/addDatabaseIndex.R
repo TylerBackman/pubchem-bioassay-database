@@ -19,5 +19,7 @@ dbGetQuery(con, "CREATE INDEX IF NOT EXISTS assays_assay_type ON assays (assay_t
 dbGetQuery(con, "CREATE INDEX IF NOT EXISTS activity_aid ON activity (aid)")
 dbGetQuery(con, "CREATE INDEX IF NOT EXISTS activity_cid ON activity (cid)")
 dbGetQuery(con, "CREATE INDEX IF NOT EXISTS activity_activity ON activity (activity)")
+dbGetQuery(con, "CREATE INDEX IF NOT EXISTS domainIndex ON domains (domain)")
+dbGetQuery(con, "CREATE INDEX IF NOT EXISTS proteinIndex ON domains (protein)")
 
 dbDisconnect(con)

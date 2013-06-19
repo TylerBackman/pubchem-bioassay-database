@@ -24,7 +24,6 @@ getAssayPaths <- function(path) {
 drv <- dbDriver("SQLite")
 con <- dbConnect(drv, dbname=outputDatabase)
 dbGetQuery(con, "CREATE TABLE sources (source_id INTEGER PRIMARY KEY ASC, description TEXT, version TEXT)")
-dbGetQuery(con, "CREATE TABLE assays (source_id INTEGER, aid INTEGER, targets TEXT, target_type TEXT, assay_type TEXT, organism TEXT)")
 dbGetQuery(con, "CREATE TABLE activity (aid INTEGER, sid INTEGER, cid INTEGER, activity INTEGER, score INTEGER)")
 
 # loop through assay CSVs and load them into the database

@@ -1,4 +1,4 @@
-all: working/bioassayDatabaseWithDomains.sqlite
+all: working/pubchemBioassay.sqlite
 
 clean:
 	rm -rf working/*
@@ -14,11 +14,7 @@ working/bioassayDatabaseWithAssayDetails.sqlite: scripts/addAssayDetails.R worki
 	cp working/bioassayDatabase.sqlite $@
 	$< working/bioassayMirror $@
 
-working/indexedBioassayDatabase.sqlite: scripts/addDatabaseIndex.R working/bioassayDatabaseWithAssayDetails.sqlite
-	cp working/bioassayDatabaseWithAssayDetails.sqlite $@
-	$< $@ 
-
-working/targets.fasta: working/indexedBioassayDatabase.sqlite
+working/targets.fasta: working/bioassayDatabaseWithAssayDetails.sqlite
 	echo "SELECT DISTINCT targets FROM assays WHERE target_type = \"protein\" AND targets NOT NULL;" | sqlite3 $< | xargs -I '{}' wget -O - "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id={}&rettype=fasta&retmode=text" >> $@
 
 working/Pfam-A.hmm:
@@ -32,6 +28,13 @@ working/domainsFromHmmscan: working/Pfam-A.hmm working/targets.fasta
 working/domainsFromHmmscanTwoCols: working/domainsFromHmmscan
 	awk '{print $$2 " " $$3}' $^ > $@
 
-working/bioassayDatabaseWithDomains.sqlite: scripts/loadDomainData.R working/targets.fasta working/domainsFromHmmscanTwoCols working/indexedBioassayDatabase.sqlite
-	cp working/indexedBioassayDatabase.sqlite $@
+working/bioassayDatabaseWithDomains.sqlite: scripts/loadDomainData.R working/targets.fasta working/domainsFromHmmscanTwoCols working/bioassayDatabaseWithAssayDetails.sqlite
+	cp working/bioassayDatabaseWithAssayDetails.sqlite $@
 	scripts/loadDomainData.R working/targets.fasta working/domainsFromHmmscanTwoCols $@
+
+working/indexedBioassayDatabase.sqlite: scripts/addDatabaseIndex.R working/bioassayDatabaseWithDomains.sqlite 
+	cp working/bioassayDatabaseWithDomains.sqlite $@
+	$< $@ 
+
+working/pubchemBioassay.sqlite: working/indexedBioassayDatabase.sqlite
+	ln -s $< $@

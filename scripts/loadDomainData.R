@@ -25,7 +25,4 @@ dbBeginTransaction(con)
 dbGetPreparedQuery(con, sql, bind.data = domains)
 dbCommit(con)
 
-dbGetQuery(con, "CREATE INDEX domainIndex ON domains (domain)")
-dbGetQuery(con, "CREATE INDEX proteinIndex ON domains (protein)")
-
 dbDisconnect(con)
