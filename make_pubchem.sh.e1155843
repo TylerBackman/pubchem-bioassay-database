@@ -1,0 +1,37 @@
+Loading required package: R.oo
+Loading required package: R.methodsS3
+R.methodsS3 v1.4.2 (2012-06-22) successfully loaded. See ?R.methodsS3 for help.
+R.oo v1.13.0 (2013-03-08) successfully loaded. See ?R.oo for help.
+
+Attaching package: 'R.oo'
+
+The following object is masked from 'package:base':
+
+    attach, detach, gc, load, save
+
+R.utils v1.23.2 (2013-03-22) successfully loaded. See ?R.utils for help.
+
+Attaching package: 'R.utils'
+
+The following object is masked from 'package:utils':
+
+    timestamp
+
+The following object is masked from 'package:base':
+
+    cat, commandArgs, getOption, inherits, isOpen, parse, warnings
+
+Loading required package: methods
+
+Attaching package: 'methods'
+
+The following object is masked from 'package:R.oo':
+
+    getClasses, getMethods
+
+Loading required package: DBI
+Error in sqliteExecStatement(con, statement, bind.data) : 
+  RS-DBI driver: (unable to bind data for parameter '$PUBCHEM_ACTIVITY_SCORE')
+Calls: dbGetPreparedQuery ... dbGetPreparedQuery -> sqliteQuickSQL -> sqliteExecStatement -> .Call
+Execution halted
+make: *** [working/bioassayDatabase.sqlite] Error 1
