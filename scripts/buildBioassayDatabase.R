@@ -6,11 +6,14 @@
 library(R.utils)
 library(RSQLite)
 
-bioassayMirror = commandArgs(trailingOnly=TRUE)[1]
-outputDatabase = commandArgs(trailingOnly=TRUE)[2]
+bioassayMirror <- commandArgs(trailingOnly=TRUE)[1]
+outputDatabase <- commandArgs(trailingOnly=TRUE)[2]
 
-# bioassayMirror <- "working/bioassayMirror_test" # TEST CODE
-# outputDatabase <- "working/bioassayDatabase_test.sqlite" # TEST CODE
+# test code for running without make:
+if(is.na(commandArgs(trailingOnly=TRUE)[1])){
+	bioassayMirror <- "working/bioassayMirror"
+	outputDatabase <- "working/bioassayDatabase.sqlite"
+}
 
 # this function returns the path of each assay file within a given folder name
 getAssayPaths <- function(path) {

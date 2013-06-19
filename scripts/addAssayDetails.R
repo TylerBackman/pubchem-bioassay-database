@@ -63,6 +63,7 @@ print("loading results into database")
 drv <- dbDriver("SQLite")
 con <- dbConnect(drv, dbname=outputDatabase)
 dbGetQuery(con, "CREATE TABLE assays (source_id INTEGER, aid INTEGER, targets TEXT, target_type TEXT, assay_type TEXT, organism TEXT)")
+dbGetQuery(con, "CREATE TABLE targets (aid INTEGER, target TEXT, target_type TEXT)")
 
 colnames(parsedTable) <- c("AID", "TARGETS", "TARGET_TYPE", "ASSAY_TYPE", "ORGANISM")
 parsedTable <- as.data.frame(parsedTable)
