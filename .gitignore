@@ -5,3 +5,4 @@ make_pubchem.sh
 # Example code in package build process
 *-Ex.R
 working/*
+*.swp
