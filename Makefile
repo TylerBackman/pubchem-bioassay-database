@@ -15,7 +15,7 @@ working/bioassayDatabaseWithAssayDetails.sqlite: scripts/addAssayDetails.R worki
 	$< working/bioassayMirror $@
 
 working/targets.fasta: working/bioassayDatabaseWithAssayDetails.sqlite
-	echo "SELECT DISTINCT targets FROM assays WHERE target_type = \"protein\" AND targets NOT NULL;" | sqlite3 $< | xargs -I '{}' wget -O - "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id={}&rettype=fasta&retmode=text" >> $@
+	echo "SELECT DISTINCT target FROM targets WHERE target_type = \"protein\" AND targets NOT NULL;" | sqlite3 $< | xargs -I '{}' wget -O - "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id={}&rettype=fasta&retmode=text" >> $@
 
 working/Pfam-A.hmm:
 	wget -O $@.gz ftp://ftp.sanger.ac.uk/pub/databases/Pfam/releases/Pfam27.0/Pfam-A.hmm.gz
