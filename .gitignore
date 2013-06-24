@@ -1,6 +1,6 @@
 # History files
 .Rhistory
-make_pubchem.sh
+make_pubchem.sh*
 
 # Example code in package build process
 *-Ex.R
