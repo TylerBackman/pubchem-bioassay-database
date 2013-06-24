@@ -36,7 +36,7 @@ assaypaths <- assaypaths[! duplicated(aids)]
 for(assaypath in assaypaths){
     aid <- as.integer(gsub("^.*?(\\d+)\\.concise\\.csv.*$", "\\1", assaypath, perl = TRUE))
     print(paste("inserting activity for assay", aid))
-    tempAssay <- read.csv(assaypath)[,c(1, 2, 3, 4)]
+    tempAssay <- read.csv(assaypath)[,c("PUBCHEM_SID", "PUBCHEM_CID", "PUBCHEM_ACTIVITY_OUTCOME", "PUBCHEM_ACTIVITY_SCORE")]
     if(nrow(tempAssay) < 1){
         next
     }

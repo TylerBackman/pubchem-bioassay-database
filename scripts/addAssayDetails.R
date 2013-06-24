@@ -6,9 +6,20 @@
 library(R.utils)
 library(RSQLite)
 library(XML)
+library(foreach)
+library(doMC)
+
+# setup multiprocessing options
+registerDoMC(cores=8)
 
 bioassayMirror = commandArgs(trailingOnly=TRUE)[1]
 outputDatabase = commandArgs(trailingOnly=TRUE)[2]
+
+# test code for running without make:
+if(is.na(commandArgs(trailingOnly=TRUE)[1])){
+	bioassayMirror <- "working/bioassayMirror"
+	outputDatabase <- "working/bioassayDatabaseWithAssayDetails.sqlite"
+}
 
 # this function returns the path of each assay file within a given folder name
 getAssayPaths <- function(path) {
@@ -22,54 +33,57 @@ getAssayPaths <- function(path) {
 assaypaths <- getAssayPaths(file.path(bioassayMirror, "Description"))
 aids <- as.integer(gsub("^.*?(\\d+)\\.concise.descr\\.xml.*$", "\\1", assaypaths, perl = TRUE))
 assaypaths <- assaypaths[! duplicated(aids)] 
-parsedTable <- t(sapply(assaypaths, function(assaypath){
-    aid <- as.integer(gsub("^.*?(\\d+)\\.concise.descr\\.xml.*$", "\\1", assaypath, perl = TRUE))
-    print(paste("parsing XML details for assay", aid))
+aids <- aids[! duplicated(aids)]
 
-    xmlPointer <- xmlTreeParse(assaypath, useInternalNodes=TRUE, addFinalizer=TRUE)
-    desc <- xmlRoot(xmlPointer, addFinalizer = TRUE)
-    free(xmlPointer)
-
-    target <- desc[[1]][["PC-AssaySubmit_assay"]][["PC-AssaySubmit_assay_descr"]][["PC-AssayDescription"]][["PC-AssayDescription_target"]][["PC-AssayTargetInfo"]][["PC-AssayTargetInfo_mol-id"]]
-    if(! is.null(target)){
-        target <- xmlToList(target)[[1]]
-    } else {
-        target <- NA
-    }
-    targetType <- desc[[1]][["PC-AssaySubmit_assay"]][["PC-AssaySubmit_assay_descr"]][["PC-AssayDescription"]][["PC-AssayDescription_target"]][["PC-AssayTargetInfo"]][["PC-AssayTargetInfo_molecule-type"]]
-    if(! is.null(targetType)){
-        targetType <- xmlToList(targetType)$.attrs[["value"]]
-    } else if(! is.na(target)){
-        targetType <- "protein"
-    } else {
-        targetType <- NA
-    }
-    assayType <- desc[[1]][["PC-AssaySubmit_assay"]][["PC-AssaySubmit_assay_descr"]][["PC-AssayDescription"]][["PC-AssayDescription_activity-outcome-method"]]
-    if(! is.null(assayType)){
-        assayType <- xmlToList(assayType)$.attrs[["value"]]
-    } else {
-        assayType <- NA
-    }
-    organism <- desc[[1]][["PC-AssaySubmit_assay"]][["PC-AssaySubmit_assay_descr"]][["PC-AssayDescription"]][["PC-AssayDescription_target"]][["PC-AssayTargetInfo"]][["PC-AssayTargetInfo_organism"]][["BioSource"]][["BioSource_org"]][["Org-ref"]][["Org-ref_orgname"]][["OrgName"]][["OrgName_name"]][["OrgName_name_binomial"]][["BinomialOrgName"]][["BinomialOrgName_genus"]]  
-    if(! is.null(organism)){
-        organism <- xmlToList(organism)[[1]]
-    } else {
-        organism <- NA
-    }
-    cbind(aid, target, targetType, assayType, organism)
-}))
-
-print("loading results into database")
+# keep only assays which have activity data
 drv <- dbDriver("SQLite")
 con <- dbConnect(drv, dbname=outputDatabase)
-dbGetQuery(con, "CREATE TABLE assays (source_id INTEGER, aid INTEGER, targets TEXT, target_type TEXT, assay_type TEXT, organism TEXT)")
-dbGetQuery(con, "CREATE TABLE targets (aid INTEGER, target TEXT, target_type TEXT)")
+dataAids <- dbGetQuery(con, "SELECT DISTINCT aid FROM activity")[,1]
+assaypaths <- assaypaths[aids %in% dataAids]
 
-colnames(parsedTable) <- c("AID", "TARGETS", "TARGET_TYPE", "ASSAY_TYPE", "ORGANISM")
+# get target molecules
+targetTable <- foreach(assaypath=assaypaths, .combine='rbind') %dopar% {
+    aid <- as.integer(gsub("^.*?(\\d+)\\.concise.descr\\.xml.*$", "\\1", assaypath, perl = TRUE))
+    xmlPointer <- xmlTreeParse(assaypath, useInternalNodes=TRUE, addFinalizer=TRUE)
+    targets <- xpathSApply(xmlPointer, "//x:PC-AssayTargetInfo_mol-id/text()", xmlValue, namespaces="x")
+    targetTypes <- xpathSApply(xmlPointer,"//x:PC-AssayTargetInfo_molecule-type/@value", namespaces="x")
+    free(xmlPointer)
+    if(is.null(targets)){
+	return(NULL)
+    } else {
+        return(cbind(aid, targets, targetTypes))
+    }
+}
+
+# load target molecules
+dbGetQuery(con, "CREATE TABLE targets (aid INTEGER, target TEXT, target_type TEXT)")
+colnames(targetTable) <- c("AID", "TARGET", "TARGET_TYPE")
+targetTable <- as.data.frame(targetTable)
+sql <- "INSERT INTO targets VALUES ($AID, $TARGET, $TARGET_TYPE)"
+dbBeginTransaction(con)
+dbGetPreparedQuery(con, sql, bind.data = targetTable)
+dbCommit(con)
+
+# get other assay details
+parsedTable <- foreach(assaypath=assaypaths, .combine='rbind') %dopar% {
+    aid <- as.integer(gsub("^.*?(\\d+)\\.concise.descr\\.xml.*$", "\\1", assaypath, perl = TRUE))
+    xmlPointer <- xmlTreeParse(assaypath, useInternalNodes=TRUE, addFinalizer=TRUE)
+    type <- xpathSApply(xmlPointer, "//x:PC-AssayDescription_activity-outcome-method/@value", namespaces="x")[[1]]
+    if(is.null(type)){
+	type <- NA
+    }
+    free(xmlPointer)
+    cbind(aid, type)
+}
+
+# load other assay details
+dbGetQuery(con, "CREATE TABLE assays (source_id INTEGER, aid INTEGER, assay_type TEXT)")
+colnames(parsedTable) <- c("AID", "ASSAY_TYPE")
 parsedTable <- as.data.frame(parsedTable)
-sql <- "INSERT INTO assays VALUES (1, $AID, $TARGETS, $TARGET_TYPE, $ASSAY_TYPE, $ORGANISM)"
+sql <- "INSERT INTO assays VALUES (1, $AID, $ASSAY_TYPE)"
 dbBeginTransaction(con)
 dbGetPreparedQuery(con, sql, bind.data = parsedTable)
 dbCommit(con)
 
 dbDisconnect(con)
+#     organism <- desc[[1]][["PC-AssaySubmit_assay"]][["PC-AssaySubmit_assay_descr"]][["PC-AssayDescription"]][["PC-AssayDescription_target"]][["PC-AssayTargetInfo"]][["PC-AssayTargetInfo_organism"]][["BioSource"]][["BioSource_org"]][["Org-ref"]][["Org-ref_orgname"]][["OrgName"]][["OrgName_name"]][["OrgName_name_binomial"]][["BinomialOrgName"]][["BinomialOrgName_genus"]]  
