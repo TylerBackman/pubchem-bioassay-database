@@ -27,7 +27,7 @@ getAssayPaths <- function(path) {
 drv <- dbDriver("SQLite")
 con <- dbConnect(drv, dbname=outputDatabase)
 dbGetQuery(con, "CREATE TABLE sources (source_id INTEGER PRIMARY KEY ASC, description TEXT, version TEXT)")
-dbGetQuery(con, "CREATE TABLE activity (aid INTEGER, sid INTEGER, cid INTEGER, activity INTEGER, score INTEGER)")
+dbGetQuery(con, "CREATE TABLE activity (aid INTEGER, compound INTEGER, activity INTEGER, score INTEGER)")
 
 # loop through assay CSVs and load them into the database
 assaypaths <- getAssayPaths(file.path(bioassayMirror, "Data"))
@@ -36,11 +36,18 @@ assaypaths <- assaypaths[! duplicated(aids)]
 for(assaypath in assaypaths){
     aid <- as.integer(gsub("^.*?(\\d+)\\.concise\\.csv.*$", "\\1", assaypath, perl = TRUE))
     print(paste("inserting activity for assay", aid))
-    tempAssay <- read.csv(assaypath)[,c("PUBCHEM_SID", "PUBCHEM_CID", "PUBCHEM_ACTIVITY_OUTCOME", "PUBCHEM_ACTIVITY_SCORE")]
+    tempAssay <- read.csv(assaypath)[,c("PUBCHEM_CID", "PUBCHEM_ACTIVITY_OUTCOME", "PUBCHEM_ACTIVITY_SCORE")]
+    outcomes <- rep(NA, nrow(tempAssay))
+    outcomes[tempAssay[,"PUBCHEM_ACTIVITY_OUTCOME"] == "Active"] <- 1   
+    outcomes[tempAssay[,"PUBCHEM_ACTIVITY_OUTCOME"] == 1] <- 0   
+    outcomes[tempAssay[,"PUBCHEM_ACTIVITY_OUTCOME"] == "Inactive"] <- 0   
+    outcomes[tempAssay[,"PUBCHEM_ACTIVITY_OUTCOME"] == 2] <- 1   
+    tempAssay[,"PUBCHEM_ACTIVITY_OUTCOME"] <- outcomes
+    tempAssay <- tempAssay[! is.na(tempAssay[,"PUBCHEM_ACTIVITY_OUTCOME"]),]
     if(nrow(tempAssay) < 1){
         next
     }
-    sql <- paste("INSERT INTO activity VALUES (", aid, ", $PUBCHEM_SID, $PUBCHEM_CID, $PUBCHEM_ACTIVITY_OUTCOME, $PUBCHEM_ACTIVITY_SCORE)", sep="")
+    sql <- paste("INSERT INTO activity VALUES (", aid, ", $PUBCHEM_CID, $PUBCHEM_ACTIVITY_OUTCOME, $PUBCHEM_ACTIVITY_SCORE)", sep="")
     dbBeginTransaction(con)
     dbGetPreparedQuery(con, sql, bind.data = tempAssay)
     dbCommit(con)
