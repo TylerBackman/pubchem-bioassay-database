@@ -27,7 +27,7 @@ getAssayPaths <- function(path) {
 drv <- dbDriver("SQLite")
 con <- dbConnect(drv, dbname=outputDatabase)
 dbGetQuery(con, "CREATE TABLE sources (source_id INTEGER PRIMARY KEY ASC, description TEXT, version TEXT)")
-dbGetQuery(con, "CREATE TABLE activity (aid INTEGER, compound INTEGER, activity INTEGER, score INTEGER)")
+dbGetQuery(con, "CREATE TABLE activity (aid INTEGER, cid INTEGER, sid INTEGER, activity INTEGER, score INTEGER)")
 
 # loop through assay CSVs and load them into the database
 assaypaths <- getAssayPaths(file.path(bioassayMirror, "Data"))
@@ -35,19 +35,25 @@ aids <- as.integer(gsub("^.*?(\\d+)\\.concise\\.csv.*$", "\\1", assaypaths, perl
 assaypaths <- assaypaths[! duplicated(aids)]
 for(assaypath in assaypaths){
     aid <- as.integer(gsub("^.*?(\\d+)\\.concise\\.csv.*$", "\\1", assaypath, perl = TRUE))
-    print(paste("inserting activity for assay", aid))
-    tempAssay <- read.csv(assaypath)[,c("PUBCHEM_CID", "PUBCHEM_ACTIVITY_OUTCOME", "PUBCHEM_ACTIVITY_SCORE")]
+    tempAssay <- read.csv(assaypath)[,c("PUBCHEM_CID", "PUBCHEM_SID", "PUBCHEM_ACTIVITY_OUTCOME", "PUBCHEM_ACTIVITY_SCORE")]
+    if(nrow(tempAssay) < 1){
+        print(paste("not inserting empty assay:", aid))
+        next
+    }
     outcomes <- rep(NA, nrow(tempAssay))
     outcomes[tempAssay[,"PUBCHEM_ACTIVITY_OUTCOME"] == "Active"] <- 1   
     outcomes[tempAssay[,"PUBCHEM_ACTIVITY_OUTCOME"] == 1] <- 0   
     outcomes[tempAssay[,"PUBCHEM_ACTIVITY_OUTCOME"] == "Inactive"] <- 0   
     outcomes[tempAssay[,"PUBCHEM_ACTIVITY_OUTCOME"] == 2] <- 1   
-    tempAssay[,"PUBCHEM_ACTIVITY_OUTCOME"] <- outcomes
-    tempAssay <- tempAssay[! is.na(tempAssay[,"PUBCHEM_ACTIVITY_OUTCOME"]),]
-    if(nrow(tempAssay) < 1){
+    if(! FALSE %in% (is.na(outcomes))){
+        print(paste("skipping assay without activity:", aid))
         next
     }
-    sql <- paste("INSERT INTO activity VALUES (", aid, ", $PUBCHEM_CID, $PUBCHEM_ACTIVITY_OUTCOME, $PUBCHEM_ACTIVITY_SCORE)", sep="")
+    tempAssay[,"PUBCHEM_ACTIVITY_OUTCOME"] <- outcomes
+#   Uncomment to avoid adding NA activity data:
+#   tempAssay <- tempAssay[! is.na(tempAssay[,"PUBCHEM_ACTIVITY_OUTCOME"]),]
+    print(paste("inserting activity for assay", aid))
+    sql <- paste("INSERT INTO activity VALUES (", aid, ", $PUBCHEM_CID, $PUBCHEM_SID, $PUBCHEM_ACTIVITY_OUTCOME, $PUBCHEM_ACTIVITY_SCORE)", sep="")
     dbBeginTransaction(con)
     dbGetPreparedQuery(con, sql, bind.data = tempAssay)
     dbCommit(con)
