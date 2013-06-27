@@ -48,7 +48,11 @@ resultsTable <- foreach(assaypath=assaypaths, .combine='rbind') %dopar% {
     targets <- xpathSApply(xmlPointer, "//x:PC-AssayTargetInfo_mol-id/text()", xmlValue, namespaces="x")
     targetTypes <- xpathSApply(xmlPointer,"//x:PC-AssayTargetInfo_molecule-type/@value", namespaces="x")
     type <- xpathSApply(xmlPointer, "//x:PC-AssayDescription_activity-outcome-method/@value", namespaces="x")[[1]]
+    comments <- xpathSApply(xmlPointer, "//x:PC-AssayDescription_comment_E/text()", xmlValue, namespaces="x")
+    scoring <- xpathSApply(xmlPointer, "//x:PC-ResultType_name/text()", xmlValue, namespaces="x")
     free(xmlPointer)
+    organism <- comments[grep("^Organism:\\W", comments)]
+    organism <- gsub("^Organism:\\W(.*)$", "\\1", organism)[1]
     if(is.null(type)){
 	type <- NA
     }
@@ -58,12 +62,15 @@ resultsTable <- foreach(assaypath=assaypaths, .combine='rbind') %dopar% {
     if(is.null(targetTypes)){
         targetTypes <- NA	
     } 
+    if(is.null(scoring)){
+        scoring <- NA	
+    } 
     if(length(targets) != length(targetTypes)){
     	stop(paste("error with aid", aid))
     }
     targetTypes <- targetTypes[! duplicated(targets)]
     targets <- targets[! duplicated(targets)]
-    return(cbind(aid, targets, targetTypes, type))
+    return(cbind(aid, targets, targetTypes, type, organism, scoring))
 }
 
 # load target molecules
@@ -77,11 +84,11 @@ dbGetPreparedQuery(con, sql, bind.data = targetTable)
 dbCommit(con)
 
 # load other assay details
-assayTable <- resultsTable[! duplicated(resultsTable[,1]),c(1,4)] 
-dbGetQuery(con, "CREATE TABLE assays (source_id INTEGER, aid INTEGER, assay_type TEXT)")
-colnames(assayTable) <- c("AID", "ASSAY_TYPE")
+assayTable <- resultsTable[! duplicated(resultsTable[,1]),c(1,4,5,6)] 
+dbGetQuery(con, "CREATE TABLE assays (source_id INTEGER, aid INTEGER, assay_type TEXT, organism TEXT, scoring TEXT)")
+colnames(assayTable) <- c("AID", "ASSAY_TYPE", "ORGANISM", "SCORING")
 assayTable <- as.data.frame(assayTable)
-sql <- "INSERT INTO assays VALUES (1, $AID, $ASSAY_TYPE)"
+sql <- "INSERT INTO assays VALUES (1, $AID, $ASSAY_TYPE, $ORGANISM, $SCORING)"
 dbBeginTransaction(con)
 dbGetPreparedQuery(con, sql, bind.data = assayTable)
 dbCommit(con)
