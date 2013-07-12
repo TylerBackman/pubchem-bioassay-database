@@ -40,5 +40,5 @@ working/indexedBioassayDatabase.sqlite: working/bioassayDatabaseWithDomains.sqli
 working/pubchemBioassay.sqlite: working/indexedBioassayDatabase.sqlite
 	ln -s $< $@
 
-working/compounds.sqlite: scripts/getCids.R working/pubchemBioassay.sqlite
+working/compounds.sqlite: scripts/getCids.R working/bioassayDatabase.sqlite
 	$^ $@

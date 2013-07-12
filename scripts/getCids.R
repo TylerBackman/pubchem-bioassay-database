@@ -27,7 +27,13 @@ cids <- as.numeric(cids)
 splitCids <- split(cids, floor(1:length(cids)/10000))
 outputconn <- initDb(outfile)
 lapply(splitCids, function(x){
-    loadSdf(outputconn, getIds(x))
+    try({
+        tempSDF <- getIds(x)
+        loadSdf(outputconn, tempSDF,
+            function(sdfset){
+                data.frame(MW = MW(sdfset, addH=TRUE))
+            })
+    })
 }) 
-# to get a compound: getCompounds(outputconn, c(221, 212))
+# to get compounds: getCompounds(outputconn, findCompoundsByName(outputconn, c(1018, 999)))
 dbDisconnect(outputconn)
