@@ -1,4 +1,4 @@
-all: working/pubchemBioassay.sqlite
+all: working/pubchemBioassay.sqlite working/compounds.sqlite
 
 clean:
 	rm -rf working/*
@@ -32,9 +32,13 @@ working/bioassayDatabaseWithDomains.sqlite: scripts/loadDomainData.R working/tar
 	cp working/bioassayDatabaseWithAssayDetails.sqlite $@
 	scripts/loadDomainData.R working/targets.fasta working/domainsFromHmmscanTwoCols $@
 
-working/indexedBioassayDatabase.sqlite: scripts/addDatabaseIndex.R working/bioassayDatabaseWithDomains.sqlite 
-	cp working/bioassayDatabaseWithDomains.sqlite $@
-	$< $@ 
+working/indexedBioassayDatabase.sqlite: working/bioassayDatabaseWithDomains.sqlite 
+	cp $< $@
+	echo "CREATE INDEX IF NOT EXISTS activity_cid ON activity (cid);" | sqlite3 $@
+	echo "CREATE INDEX IF NOT EXISTS targets_aid ON targets (aid);" | sqlite3 $@
 
 working/pubchemBioassay.sqlite: working/indexedBioassayDatabase.sqlite
 	ln -s $< $@
+
+working/compounds.sqlite: scripts/getCids.R working/pubchemBioassay.sqlite
+	$^ $@
