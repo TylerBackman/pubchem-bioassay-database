@@ -32,7 +32,8 @@ lapply(splitCids, function(x){
         loadSdf(outputconn, tempSDF,
             function(sdfset){
                 data.frame(MW = MW(sdfset, addH=TRUE))
-            })
+            }
+        )
     })
 }) 
 # to get compounds: getCompounds(outputconn, findCompoundsByName(outputconn, c(1018, 999)))
