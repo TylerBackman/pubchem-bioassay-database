@@ -12,7 +12,7 @@ outfile = commandArgs(trailingOnly=TRUE)[2]
 
 # test code for running without make:
 if(is.na(commandArgs(trailingOnly=TRUE)[1])){
-    database <- "working/bioassayDatabaseWithDomains.sqlite"
+    database <- "working/bioassayDatabase.sqlite"
     outfile <- "working/compounds.sqlite"
 }
 
@@ -24,9 +24,8 @@ dbDisconnect(con)
 cids <- as.numeric(cids)
 
 # load structures in database 10,000 at a time 
-splitCids <- split(cids, floor(1:length(cids)/10000))
 outputconn <- initDb(outfile)
-lapply(splitCids, function(x){
+loadIds <- function(x){
     try({
         tempSDF <- getIds(x)
         loadSdf(outputconn, tempSDF,
@@ -35,6 +34,25 @@ lapply(splitCids, function(x){
             }
         )
     })
-}) 
+}
+
+# keep retrying in smaller and smaller groups until individual compounds that won't load are identified
+groupSize <- 2^13  
+while(groupSize >= 1){
+    print(paste("trying load with groupsize", groupSize))
+    cidsInDB <- dbGetQuery(outputconn, "SELECT DISTINCT name FROM compounds WHERE name NOT NULL and name != ''")
+    cidsInDB <- as.numeric(cidsInDB[,1])
+    notLoaded <- setdiff(cids, cidsInDB)
+    if(length(notLoaded) > 0){
+        splitCids <- split(cids, floor(1:length(cids)/groupsize))
+        lapply(splitCids, loadIds)
+    } else {
+        break
+    }
+    groupSize <- groupSize / 2
+}
+
+print(paste("total unloaded compounds:", length(notLoaded), "out of", length(cids)))
+
 # to get compounds: getCompounds(outputconn, findCompoundsByName(outputconn, c(1018, 999)))
 dbDisconnect(outputconn)
