@@ -43,8 +43,9 @@ while(groupSize >= 1){
     cidsInDB <- dbGetQuery(outputconn, "SELECT DISTINCT name FROM compounds WHERE name NOT NULL and name != ''")
     cidsInDB <- as.numeric(cidsInDB[,1])
     notLoaded <- setdiff(cids, cidsInDB)
+    print(paste("unloaded compounds:", length(notLoaded), "out of", length(cids)))
     if(length(notLoaded) > 0){
-        splitCids <- split(cids, floor(1:length(cids)/groupsize))
+        splitCids <- split(cids, floor(1:length(cids)/groupSize))
         lapply(splitCids, loadIds)
     } else {
         break
@@ -52,7 +53,7 @@ while(groupSize >= 1){
     groupSize <- groupSize / 2
 }
 
-print(paste("total unloaded compounds:", length(notLoaded), "out of", length(cids)))
+print(paste("final unloaded compounds:", length(notLoaded), "out of", length(cids)))
 
 # to get compounds: getCompounds(outputconn, findCompoundsByName(outputconn, c(1018, 999)))
 dbDisconnect(outputconn)
