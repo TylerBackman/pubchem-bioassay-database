@@ -23,7 +23,7 @@ cids <- dbGetQuery(con, "SELECT DISTINCT cid FROM activity WHERE CID NOT NULL")[
 dbDisconnect(con)
 cids <- as.numeric(cids)
 
-# load structures in database 10,000 at a time 
+# prepare to load structures in database
 outputconn <- initDb(outfile)
 loadIds <- function(x){
     try({
