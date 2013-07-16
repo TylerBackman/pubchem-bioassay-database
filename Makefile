@@ -35,10 +35,12 @@ working/bioassayDatabaseWithDomains.sqlite: scripts/loadDomainData.R working/tar
 working/indexedBioassayDatabase.sqlite: working/bioassayDatabaseWithDomains.sqlite 
 	cp $< $@
 	echo "CREATE INDEX IF NOT EXISTS activity_cid ON activity (cid);" | sqlite3 $@
+	echo "CREATE INDEX IF NOT EXISTS activity_aid ON activity (aid);" | sqlite3 $@
 	echo "CREATE INDEX IF NOT EXISTS targets_aid ON targets (aid);" | sqlite3 $@
+	echo "CREATE INDEX IF NOT EXISTS targets_target ON targets (target);" | sqlite3 $@
 
 working/pubchemBioassay.sqlite: working/indexedBioassayDatabase.sqlite
-	ln -s $< $@
+	ln -s indexedBioassayDatabase.sqlite $@ 
 
 working/compounds.sqlite: scripts/getCids.R working/bioassayDatabase.sqlite
 	$^ $@
