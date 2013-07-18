@@ -1,4 +1,4 @@
-all: working/pubchemBioassay.sqlite working/compounds.sqlite
+all: working/pubchemBioassay.sqlite working/compounds.sqlite working/summarystats.txt
 
 clean:
 	rm -rf working/*
@@ -43,4 +43,7 @@ working/pubchemBioassay.sqlite: working/indexedBioassayDatabase.sqlite
 	ln -s indexedBioassayDatabase.sqlite $@ 
 
 working/compounds.sqlite: scripts/getCids.R working/bioassayDatabase.sqlite
+	$^ $@
+
+working/summarystats.txt: scripts/computeStats.R working/pubchemBioassay.sqlite
 	$^ $@
