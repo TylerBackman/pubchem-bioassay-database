@@ -26,7 +26,7 @@ targetSpecies <- attr(targetSequences, "species")
 proteinAssays <- dbGetQuery(con, "SELECT aid, target FROM targets WHERE target NOT NULL and target_type = 'protein'")
 
 assaySpecies <- merge(x=proteinAssays, y=cbind(targets, targetSpecies), all.x=T, by.x=2, by.y=1)[,2:3]
-colnames(assaySpecies) <- c("ORGANISM", "AID")
+colnames(assaySpecies) <- c("AID", "ORGANISM")
 
 sql <- "UPDATE assays SET organism=$ORGANISM WHERE aid=$AID"
 dbBeginTransaction(con)
