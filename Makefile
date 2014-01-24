@@ -44,7 +44,7 @@ working/bioassayDatabaseWithSpecies.sqlite: scripts/annotateSpecies.R working/in
 	$< $@
 
 working/pubchemBioassay.sqlite: working/indexedBioassayDatabase.sqlite
-	ln -s indexedBioassayDatabase.sqlite $@ 
+	ln -s bioassayDatabaseWithSpecies.sqlite $@ 
 
 working/compounds.sqlite: scripts/getCids.R working/bioassayDatabase.sqlite
 	$^ $@
