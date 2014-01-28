@@ -39,8 +39,8 @@ working/bioassayDatabaseWithSpecies.sqlite: src/annotateSpecies.R working/indexe
 	cp working/indexedBioassayDatabase.sqlite $@
 	$< $@
 
-working/pubchemBioassay.sqlite: working/indexedBioassayDatabase.sqlite
-	ln -s bioassayDatabaseWithSpecies.sqlite $@ 
+working/pubchemBioassay.sqlite: working/bioassayDatabaseWithSpecies.sqlite 
+	ln -s $< $@ 
 
 working/compounds.sqlite: src/getCids.R working/bioassayDatabase.sqlite
 	$^ $@
