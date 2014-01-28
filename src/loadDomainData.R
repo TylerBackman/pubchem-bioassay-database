@@ -18,7 +18,7 @@ domains[,1] <- gsub("^(PF\\d*).*", "\\1", domains[,1], perl=TRUE)
 domains[,2] <- gsub("^gi\\|(\\d*)\\|.*", "\\1", domains[,2], perl=TRUE)
 colnames(domains) <- c("DOMAIN", "TARGET")
 
-dbGetQuery(con, "CREATE TABLE domains (domain TEXT, target INTEGER)")
+# dbGetQuery(con, "CREATE TABLE domains (domain TEXT, target INTEGER)")
 
 sql <- "INSERT INTO domains VALUES ($DOMAIN, $TARGET)"
 dbBeginTransaction(con)

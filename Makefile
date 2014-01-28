@@ -10,11 +10,7 @@ working/bioassayMirror: src/mirrorBioassay.sh
 working/bioassayDatabase.sqlite: src/buildBioassayDatabase.R working/bioassayMirror
 	$^ proteinsOnly $@
 
-working/bioassayDatabaseWithAssayDetails.sqlite: scripts/addAssayDetails.R working/bioassayMirror working/bioassayDatabase.sqlite
-	cp working/bioassayDatabase.sqlite $@
-	$< working/bioassayMirror $@
-
-working/targets.fasta: working/bioassayDatabaseWithAssayDetails.sqlite
+working/targets.fasta: working/bioassayDatabase.sqlite
 	echo "SELECT DISTINCT target FROM targets WHERE target_type = \"protein\";" | sqlite3 $< | xargs -I '{}' wget -O - "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id={}&rettype=fasta&retmode=text" >> $@
 
 working/Pfam-A.hmm:
@@ -28,9 +24,9 @@ working/domainsFromHmmscan: working/Pfam-A.hmm working/targets.fasta
 working/domainsFromHmmscanTwoCols: working/domainsFromHmmscan
 	awk '{print $$2 " " $$3}' $^ > $@
 
-working/bioassayDatabaseWithDomains.sqlite: scripts/loadDomainData.R working/targets.fasta working/domainsFromHmmscanTwoCols working/bioassayDatabaseWithAssayDetails.sqlite
-	cp working/bioassayDatabaseWithAssayDetails.sqlite $@
-	scripts/loadDomainData.R working/targets.fasta working/domainsFromHmmscanTwoCols $@
+working/bioassayDatabaseWithDomains.sqlite: src/loadDomainData.R working/targets.fasta working/domainsFromHmmscanTwoCols working/bioassayDatabase.sqlite
+	cp working/bioassayDatabase.sqlite $@
+	src/loadDomainData.R working/targets.fasta working/domainsFromHmmscanTwoCols $@
 
 working/indexedBioassayDatabase.sqlite: working/bioassayDatabaseWithDomains.sqlite 
 	cp $< $@
@@ -39,15 +35,15 @@ working/indexedBioassayDatabase.sqlite: working/bioassayDatabaseWithDomains.sqli
 	echo "CREATE INDEX IF NOT EXISTS targets_aid ON targets (aid);" | sqlite3 $@
 	echo "CREATE INDEX IF NOT EXISTS targets_target ON targets (target);" | sqlite3 $@
 
-working/bioassayDatabaseWithSpecies.sqlite: scripts/annotateSpecies.R working/indexedBioassayDatabase.sqlite
+working/bioassayDatabaseWithSpecies.sqlite: src/annotateSpecies.R working/indexedBioassayDatabase.sqlite
 	cp working/indexedBioassayDatabase.sqlite $@
 	$< $@
 
 working/pubchemBioassay.sqlite: working/indexedBioassayDatabase.sqlite
 	ln -s bioassayDatabaseWithSpecies.sqlite $@ 
 
-working/compounds.sqlite: scripts/getCids.R working/bioassayDatabase.sqlite
+working/compounds.sqlite: src/getCids.R working/bioassayDatabase.sqlite
 	$^ $@
 
-working/summarystats.txt: scripts/computeStats.R working/pubchemBioassay.sqlite
+working/summarystats.txt: src/computeStats.R working/pubchemBioassay.sqlite
 	$^ $@
