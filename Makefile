@@ -3,12 +3,12 @@ all: working/pubchemBioassay.sqlite working/compounds.sqlite working/summarystat
 clean:
 	rm -rf working/*
 
-working/bioassayMirror: scripts/mirrorBioassay.sh
+working/bioassayMirror: src/mirrorBioassay.sh
 	mkdir -p $@
 	$^ $@
 	
-working/bioassayDatabase.sqlite: scripts/buildBioassayDatabase.R working/bioassayMirror
-	$^ $@
+working/bioassayDatabase.sqlite: src/buildBioassayDatabase.R working/bioassayMirror
+	$^ proteinsOnly $@
 
 working/bioassayDatabaseWithAssayDetails.sqlite: scripts/addAssayDetails.R working/bioassayMirror working/bioassayDatabase.sqlite
 	cp working/bioassayDatabase.sqlite $@
