@@ -40,7 +40,7 @@ working/bioassayDatabaseWithSpecies.sqlite: src/annotateSpecies.R working/indexe
 	$< $@
 
 working/pubchemBioassay.sqlite: working/bioassayDatabaseWithSpecies.sqlite 
-	ln -s $< $@ 
+	ln -s bioassayDatabaseWithSpecies.sqlite $@ 
 
 working/compounds.sqlite: src/getCids.R working/bioassayDatabase.sqlite
 	$^ $@
