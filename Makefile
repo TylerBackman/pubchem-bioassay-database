@@ -47,3 +47,7 @@ working/compounds.sqlite: src/getCids.R working/bioassayDatabase.sqlite
 
 working/summarystats.txt: src/computeStats.R working/pubchemBioassay.sqlite
 	$^ $@
+
+working/kClust: working/targets.fasta
+	mkdir $@
+	kClust -i $^ -d $@ -s 0.52
