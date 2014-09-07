@@ -6,12 +6,13 @@
 library(R.utils)
 library(RSQLite)
 library(ChemmineR)
+source("../chemminetools/ChemmineR/ChemmineR.R")
 
 database = commandArgs(trailingOnly=TRUE)[1]
 outfile = commandArgs(trailingOnly=TRUE)[2]
 
 # test code for running without make:
-if(is.na(commandArgs(trailingOnly=TRUE)[1])){
+if(is.null(commandArgs(trailingOnly=TRUE)[1])){
     database <- "working/bioassayDatabase.sqlite"
     outfile <- "working/compounds.sqlite"
 }
@@ -27,7 +28,8 @@ cids <- as.numeric(cids)
 outputconn <- initDb(outfile)
 loadIds <- function(x){
     try({
-        tempSDF <- getIds(x)
+        job <- launchCMTool('pubchemID2SDF',x)
+        tempSDF <- result(job)
         loadSdf(outputconn, tempSDF,
             function(sdfset){
                 data.frame(MW = MW(sdfset, addH=TRUE))
