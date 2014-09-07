@@ -50,4 +50,4 @@ working/summarystats.txt: src/computeStats.R working/pubchemBioassay.sqlite
 
 working/kClust: working/targets.fasta
 	mkdir $@
-	kClust -i $^ -d $@ -s 0.52
+	kClust -i $^ -d $@ -s 0.52 -M 16000MB
