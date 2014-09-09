@@ -1,4 +1,4 @@
-all: working/pubchemBioassay.sqlite working/compounds.sqlite working/summarystats.txt
+all: working/kClust working/pubchemBioassay.sqlite working/compounds.sqlite working/summarystats.txt
 
 clean:
 	rm -rf working/*
@@ -48,6 +48,15 @@ working/compounds.sqlite: src/getCids.R working/bioassayDatabase.sqlite
 working/summarystats.txt: src/computeStats.R working/pubchemBioassay.sqlite
 	$^ $@
 
+# use kClust to cluster proteins by sequence
 working/kClust: working/targets.fasta
 	mkdir $@
 	kClust -i $^ -d $@ -s 0.52 -M 16000MB
+
+# download all of PubChem Compound
+working/pubchemCompoundMirror:
+	mkdir -p $@
+	wget -r -nd ftp://ftp.ncbi.nlm.nih.gov/pubchem/Compound/CURRENT-Full/SDF/ -P $@
+
+# compute atoms pairs for all compounds that participate in at least 10 assays
+

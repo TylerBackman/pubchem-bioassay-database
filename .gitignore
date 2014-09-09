@@ -2,6 +2,7 @@
 .Rhistory
 make_pubchem.sh*
 make_compounddb.sh*
+make_apDatabase.sh
 
 # Example code in package build process
 *-Ex.R
