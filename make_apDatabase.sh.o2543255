@@ -1,0 +1,67 @@
+/var/spool/pbs/mom_priv/jobs/2543255.torque01.int.bioinfo.ucr.edu.SC: 12: source: not found
+/var/spool/pbs/mom_priv/jobs/2543255.torque01.int.bioinfo.ucr.edu.SC: 15: module: not found
+/var/spool/pbs/mom_priv/jobs/2543255.torque01.int.bioinfo.ucr.edu.SC: 16: module: not found
+Loading required package: R.oo
+Loading required package: R.methodsS3
+R.methodsS3 v1.6.1 (2014-01-04) successfully loaded. See ?R.methodsS3 for help.
+R.oo v1.18.0 (2014-02-22) successfully loaded. See ?R.oo for help.
+
+Attaching package: 'R.oo'
+
+The following objects are masked from 'package:base':
+
+    attach, detach, gc, load, save
+
+R.utils v1.32.4 (2014-05-14) successfully loaded. See ?R.utils for help.
+
+Attaching package: 'R.utils'
+
+The following object is masked from 'package:utils':
+
+    timestamp
+
+The following objects are masked from 'package:base':
+
+    cat, commandArgs, getOption, inherits, isOpen, parse, warnings
+
+Loading required package: methods
+
+Attaching package: 'methods'
+
+The following objects are masked from 'package:R.oo':
+
+    getClasses, getMethods
+
+
+Attaching package: 'ChemmineR'
+
+The following object is masked from 'package:R.utils':
+
+    header
+
+Loading required package: DBI
+Loading required package: RSQLite
+Loading required package: Matrix
+Loading required package: rjson
+Loading required package: iterators
+Loading required package: Rmpi
+[n08:26506] [[11777,1],0] FORKING HNP: orted --hnp --set-sid --report-uri 28 --singleton-died-pipe 29 -mca state_novm_select 1 -mca ess_base_jobid 771817472
+--------------------------------------------------------------------------
+An MPI process has executed an operation involving a call to the
+"fork()" system call to create a child process.  Open MPI is currently
+operating in a condition that could result in memory corruption or
+other system errors; your MPI job may hang, crash, or produce silent
+data corruption.  The use of fork() (or system() or other calls that
+create child processes) is strongly discouraged.  
+
+The process that invoked fork was:
+
+  Local host:          n08 (PID 26506)
+  MPI_COMM_WORLD rank: 0
+
+If you are *absolutely sure* that your application will successfully
+and correctly survive a call to fork(), you may disable this warning
+by setting the mpi_warn_on_fork MCA parameter to 0.
+--------------------------------------------------------------------------
+	16 slaves are spawned successfully. 0 failed.
+[1] 1

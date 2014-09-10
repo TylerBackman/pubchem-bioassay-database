@@ -27,7 +27,7 @@ nodes <- 16
 
 # get cids from database
 db <- connectBioassayDB(database)
-cids <- queryBioassayDB(db, "SELECT DISTINCT cid FROM activity WHERE CID NOT NULL LIMIT 10")[[1]]
+cids <- queryBioassayDB(db, "SELECT DISTINCT cid FROM activity WHERE CID NOT NULL")[[1]]
 cids <- as.numeric(cids)
 disconnectBioassayDB(db)
 
