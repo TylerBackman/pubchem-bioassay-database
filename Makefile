@@ -58,5 +58,6 @@ working/pubchemCompoundMirror:
 	mkdir -p $@
 	wget -r -nd ftp://ftp.ncbi.nlm.nih.gov/pubchem/Compound/CURRENT-Full/SDF/ -P $@
 
-# compute atoms pairs for all compounds that participate in at least 10 assays
-
+# compute atoms pairs for all compounds in parallel on mpi cluster 
+working/ap.rda: src/make_apDatabase.sh src/computeAtomPairs.R working/pubchemCompoundMirror
+	qsub $<
