@@ -1,6 +1,7 @@
 # History files
 .Rhistory
 make_pubchem.sh*
+make.sh*
 make_compounddb.sh*
 make_apDatabase.sh
 

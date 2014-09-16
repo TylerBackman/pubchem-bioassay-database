@@ -61,3 +61,7 @@ working/pubchemCompoundMirror:
 # compute atoms pairs for all compounds in parallel on mpi cluster 
 working/ap.rda: src/make_apDatabase.sh src/computeAtomPairs.R working/pubchemCompoundMirror
 	qsub $<
+
+# create EI database for all compounds
+working/eiDatabase: src/makeEiDatabase.R working/pubchemCompoundMirror working/bioassayDatabase.sqlite
+	$^ $@
