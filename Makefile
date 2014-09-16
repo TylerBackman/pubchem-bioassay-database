@@ -64,6 +64,7 @@ working/ap.rda: src/make_apDatabase.sh src/computeAtomPairs.R working/pubchemCom
 
 # create EI database for all compounds
 working/eiDatabase: src/makeEiDatabase.R working/pubchemCompoundMirror working/bioassayDatabase.sqlite
+	mkdir -p $@
 	$^ $@
 
 # index EI database 
