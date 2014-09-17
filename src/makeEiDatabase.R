@@ -36,11 +36,13 @@ for (i in sdfs) {
     cidSubset <- cids[cids <= higherLimit]
     cidSubset <- cidSubset[cidSubset >= lowerLimit]
     if(length(cidSubset) == 0) next    
-    library(ChemmineR)
     mySdf <- read.SDFset(i)
-    mySdf <- mySdf[validSDF(mySdf)]
+    # mySdf <- mySdf[validSDF(mySdf)]
     if(length(mySdf) == 0) next    
     mySdf <- mySdf[sdfid(mySdf) %in% cidSubset]
     if(length(mySdf) == 0) next  
-    eiInit(mySdf,dir=eiWorkFolder)
+    tempSdf <- tempfile()
+    write.SDF(mySdf, tempSdf)
+    eiInit(tempSdf,dir=eiWorkFolder)
+    unlink(tempSdf)
 }
