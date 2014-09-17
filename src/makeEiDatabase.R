@@ -37,7 +37,7 @@ for (i in sdfs) {
     cidSubset <- cidSubset[cidSubset >= lowerLimit]
     if(length(cidSubset) == 0) next    
     mySdf <- read.SDFset(i)
-    # mySdf <- mySdf[validSDF(mySdf)]
+    mySdf <- mySdf[validSDF(mySdf)]
     if(length(mySdf) == 0) next    
     mySdf <- mySdf[sdfid(mySdf) %in% cidSubset]
     if(length(mySdf) == 0) next  
