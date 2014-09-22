@@ -8,6 +8,10 @@ library(ChemmineR)
 library(bioassayR)
 library(eiR)
 
+# load openbabel (specific code for UCR Biocluster)
+library(modules)
+moduleload("openbabel/2.3.2")
+
 pubchemCompoundMirror = commandArgs(trailingOnly=TRUE)[1]
 database = commandArgs(trailingOnly=TRUE)[2]
 eiWorkFolder = commandArgs(trailingOnly=TRUE)[3]
