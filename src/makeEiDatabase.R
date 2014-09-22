@@ -45,8 +45,9 @@ for (i in sdfs) {
     if(length(mySdf) == 0) next    
     mySdf <- mySdf[sdfid(mySdf) %in% cidSubset]
     if(length(mySdf) == 0) next  
-    tempSdf <- tempfile()
-    write.SDF(mySdf, tempSdf)
-    eiInit(tempSdf,dir=eiWorkFolder)
-    unlink(tempSdf)
+#    tempSdf <- tempfile()
+#    write.SDF(mySdf, tempSdf)
+#    eiInit(tempSdf,dir=eiWorkFolder)
+    eiInit(mySdf,dir=eiWorkFolder)
+#    unlink(tempSdf)
 }
