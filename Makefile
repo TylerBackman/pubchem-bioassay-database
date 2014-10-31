@@ -71,3 +71,21 @@ working/eiDatabase: src/makeEiDatabase.R working/pubchemCompoundMirror working/b
 working/indexedEiDatabase: src/indexEiDatabase.R working/eiDatabase 
 	cp -R working/eiDatabase $@		
 	$< $@
+
+####################################################
+# structural clustering analysis using EI/postgres #
+####################################################
+
+# extract active CIDs and form SDF
+working/activeCompounds.sdf: src/extractActives.R working/pubchemCompoundMirror working/bioassayDatabase.sqlite
+	$^ $@
+
+# create postgres server
+
+# launch postgres server on a node
+
+# load compounds in parallel
+
+# index EI database
+
+# cluster compounds
