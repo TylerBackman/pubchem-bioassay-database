@@ -3,6 +3,10 @@ all: working/kClust working/pubchemBioassay.sqlite working/compounds.sqlite work
 clean:
 	rm -rf working/*
 
+working/mayachemtools/bin/SplitSDFiles.pl:
+	wget http://www.mayachemtools.org/download/mayachemtools.tar.gz -O working/mayachemtools.tar.gz
+	tar xvfz working/mayachemtools.tar.gz -C working/
+
 working/bioassayMirror: src/mirrorBioassay.sh
 	mkdir -p $@
 	$^ $@
@@ -63,14 +67,14 @@ working/ap.rda: src/make_apDatabase.sh src/computeAtomPairs.R working/pubchemCom
 	qsub $<
 
 # create EI database for all compounds
-working/eiDatabase: src/makeEiDatabase.R working/pubchemCompoundMirror working/bioassayDatabase.sqlite
-	mkdir -p $@
-	$^ $@
+# working/eiDatabase: src/makeEiDatabase.R working/pubchemCompoundMirror working/bioassayDatabase.sqlite
+#	mkdir -p $@
+#	$^ $@
 
 # index EI database 
-working/indexedEiDatabase: src/indexEiDatabase.R working/eiDatabase 
-	cp -R working/eiDatabase $@		
-	$< $@
+#working/indexedEiDatabase: src/indexEiDatabase.R working/eiDatabase 
+#	cp -R working/eiDatabase $@		
+#	$< $@
 
 ####################################################
 # structural clustering analysis using EI/postgres #
@@ -80,13 +84,16 @@ working/indexedEiDatabase: src/indexEiDatabase.R working/eiDatabase
 working/activeCompounds.sdf: src/extractActives.R working/pubchemCompoundMirror working/bioassayDatabase.sqlite
 	$^ $@
 
-# create postgres server
-working/postgres.zip:
-	wget -O $@ https://github.com/postgres/postgres/archive/master.zip
+# split activeCompounds into small files to load in parallel
+working/splitFolder: working/mayachemtools/bin/SplitSDFiles.pl working/activeCompounds.sdf
+	mkdir -p $@
+	$< ../activeCompounds.sdf --numcmpds 1000 -m Cmpds -w $@ 
 
-# launch postgres server on a node
 
 # load compounds in parallel
+working/eiDatabase: src/makeEiDatabaseParallel.R working/splitFolder 
+	mkdir -p $@
+	$^ $@
 
 # index EI database
 
