@@ -81,6 +81,8 @@ working/activeCompounds.sdf: src/extractActives.R working/pubchemCompoundMirror 
 	$^ $@
 
 # create postgres server
+working/postgres.zip:
+	wget -O $@ https://github.com/postgres/postgres/archive/master.zip
 
 # launch postgres server on a node
 

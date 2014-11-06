@@ -46,8 +46,14 @@ for (i in sdfs) {
     if(length(mySdf) == 0) next  
 
     # append 'mySdf' to 'outputFile'
-    tempfn <- tempfile()
-    write.SDF(mySdf, tempfn)
-    file.append(outputFile, tempfn)
-    unlink(tempfn)
+    fileConn<-file(outputFile, open="a")
+    for(i in seq(along=mySdf)){
+        sdf <- sdf2str(mySdf[[i]])
+        sdf <- paste(sdf, collapse="\n")
+        writeLines(sdf, fileConn)
+    }
+    close(fileConn)
+    # get memory back
+    rm(mySdf)
+    gc()
 }
