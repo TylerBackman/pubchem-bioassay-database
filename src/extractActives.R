@@ -32,7 +32,7 @@ disconnectBioassayDB(db)
 sdfs <- list.files(pubchemCompoundMirror, full.names = TRUE)
 sdfs <- sdfs[grep(".sdf.gz$", sdfs)]
 
-# add compounds to EI database one file at a time
+# add compounds to output file one file at a time
 for (i in sdfs) {
     lowerLimit <- as.numeric(gsub("^.*Compound_(\\d+)_(\\d+).sdf.gz", "\\1", i))
     higherLimit <- as.numeric(gsub("^.*Compound_(\\d+)_(\\d+).sdf.gz", "\\2", i))
