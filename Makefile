@@ -96,5 +96,8 @@ working/eiDatabase: src/makeEiDatabaseParallel.R working/splitFolder
 	$^ $@
 
 # index EI database
+working/indexedEiDatabase: src/indexEiDatabase.R working/eiDatabase 
+	cp -R working/eiDatabase $@		
+	$< $@
 
 # cluster compounds
