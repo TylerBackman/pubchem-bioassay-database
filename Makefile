@@ -1,3 +1,4 @@
+mpiCores = 24
 all: working/kClust working/pubchemBioassay.sqlite working/compounds.sqlite working/summarystats.txt
 
 clean:
@@ -93,7 +94,7 @@ working/splitFolder: working/mayachemtools/bin/SplitSDFiles.pl working/activeCom
 # load compounds in parallel
 working/eiDatabase: src/makeEiDatabaseParallel.R working/splitFolder 
 	mkdir -p $@
-	$^ $@
+	$^ $@ $(mpiCores)
 
 # index EI database
 working/indexedEiDatabase: src/indexEiDatabase.R working/eiDatabase 
