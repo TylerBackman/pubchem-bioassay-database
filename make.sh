@@ -1,9 +1,9 @@
 #!/bin/bash
 
 #PBS -j oe
-#PBS -l nodes=1:ppn=1
-##PBS -l nodes=n08:ppn=4+n09:ppn=4
-#PBS -l mem=2gb 
+##PBS -l nodes=1:ppn=1
+#PBS -l nodes=n08:ppn=8+n09:ppn=8
+#PBS -l mem=16gb 
 #PBS -l walltime=880:00:00 
 ##PBS -q highmem 
 
