@@ -44,8 +44,12 @@ working/bioassayDatabaseWithSpecies.sqlite: src/annotateSpecies.R working/indexe
 	cp working/indexedBioassayDatabase.sqlite $@
 	$< $@
 
-working/pubchemBioassay.sqlite: working/bioassayDatabaseWithSpecies.sqlite 
-	ln -s bioassayDatabaseWithSpecies.sqlite $@ 
+working/bioassayDatabaseNoDuplicates.sqlite: working/bioassayDatabaseWithSpecies.sqlite
+	cp $< $@
+	echo "DELETE FROM activity WHERE rowid NOT IN (SELECT rowid, max(activity) FROM activity GROUP BY aid, cid);" | sqlite3 $@
+
+working/pubchemBioassay.sqlite: working/bioassayDatabaseNoDuplicates.sqlite 
+	ln -s bioassayDatabaseNoDuplicates.sqlite $@ 
 
 working/compounds.sqlite: src/getCids.R working/bioassayDatabase.sqlite
 	$^ $@
@@ -99,6 +103,6 @@ working/eiDatabase: src/makeEiDatabaseParallel.R working/splitFolder
 # index EI database
 working/indexedEiDatabase: src/indexEiDatabase.R working/eiDatabase 
 	cp -R working/eiDatabase $@		
-	$< $@
+	$< $@ $(mpiCores)
 
 # cluster compounds
