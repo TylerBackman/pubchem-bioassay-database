@@ -45,8 +45,9 @@ working/bioassayDatabaseWithSpecies.sqlite: src/annotateSpecies.R working/indexe
 	$< $@
 
 working/bioassayDatabaseNoDuplicates.sqlite: working/bioassayDatabaseWithSpecies.sqlite
-	cp $< $@
-	echo "DELETE FROM activity WHERE rowid NOT IN (SELECT rowid, max(activity) FROM activity GROUP BY aid, cid);" | sqlite3 $@
+	cp $< /dev/shm/bioassayDatabaseNoDuplicates.sqlite
+	echo "DELETE FROM activity WHERE rowid NOT IN (SELECT min(rowid) FROM activity GROUP BY aid, cid);" | sqlite3 /dev/shm/bioassayDatabaseNoDuplicates.sqlite
+	mv /dev/shm/bioassayDatabaseNoDuplicates.sqlite $@
 
 working/pubchemBioassay.sqlite: working/bioassayDatabaseNoDuplicates.sqlite 
 	ln -s bioassayDatabaseNoDuplicates.sqlite $@ 
