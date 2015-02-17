@@ -8,6 +8,15 @@ working/mayachemtools/bin/SplitSDFiles.pl:
 	wget http://www.mayachemtools.org/download/mayachemtools.tar.gz -O working/mayachemtools.tar.gz
 	tar xvfz working/mayachemtools.tar.gz -C working/
 
+# download uniprot ID mappings
+working/uniprot_id_mapping.dat.gz:
+	mkdir -p working
+	wget ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/idmapping.dat.gz -O $@
+
+# extract GI-> uniprot ID mappings to uncompressed text file
+working/gi_uniprot_mapping.dat: working/uniprot_id_mapping.dat.gz
+	zcat $< | awk '{if ($$2 == "GI") print $$0;}' > $@
+
 working/bioassayMirror: src/mirrorBioassay.sh
 	mkdir -p $@
 	$^ $@
@@ -33,7 +42,11 @@ working/bioassayDatabaseWithDomains.sqlite: src/loadDomainData.R working/targets
 	cp working/bioassayDatabase.sqlite $@
 	src/loadDomainData.R working/targets.fasta working/domainsFromHmmscanTwoCols $@
 
-working/indexedBioassayDatabase.sqlite: working/bioassayDatabaseWithDomains.sqlite 
+working/databaseWithTargetTranslations.sqlite: src/loadTranslations.R working/bioassayDatabaseWithDomains.sqlite working/gi_uniprot_mapping.dat
+	cp working/bioassayDatabaseWithDomains.sqlite $@
+	$< working/gi_uniprot_mapping.dat $@
+
+working/indexedBioassayDatabase.sqlite: working/databaseWithTargetTranslations.sqlite 
 	cp $< $@
 	echo "CREATE INDEX IF NOT EXISTS activity_cid ON activity (cid);" | sqlite3 $@
 	echo "CREATE INDEX IF NOT EXISTS activity_aid ON activity (aid);" | sqlite3 $@

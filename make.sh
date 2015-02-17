@@ -2,9 +2,9 @@
 
 #PBS -j oe
 #PBS -l nodes=1:ppn=1
-#PBS -l mem=16gb 
-##PBS -l walltime=600:00:00 
-#PBS -q highmem 
+##PBS -l mem=16gb 
+#PBS -l walltime=168:00:00 
+##PBS -q highmem 
 
 cd $PBS_O_WORKDIR
 
@@ -18,4 +18,5 @@ module load openbabel
 
 export mpiCores="$PBS_NP"
 # make -e working/pubchemBioassay.sqlite
-make -e working/kClust 
+# make -e working/kClust 
+make -e working/databaseWithTargetTranslations.sqlite
