@@ -16,7 +16,7 @@ if(is.na(commandArgs(trailingOnly=TRUE)[1])){
     databaseFile <- "working/databaseWithTargetTranslations.sqlite"
 }
 
-database <- connectBioassayDB(databaseFile, writable = TRUE)
+database <- connectBioassayDB(databaseFile, writeable = TRUE)
 allTargets <- queryBioassayDB(database, "SELECT DISTINCT target FROM targets")[[1]]
 con  <- file(translations, open = "r")
 while (length(oneLine <- readLines(con, n = 1, warn = FALSE)) > 0) {
