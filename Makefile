@@ -39,6 +39,7 @@ working/indexedBioassayDatabase.sqlite: working/bioassayDatabaseWithDomains.sqli
 	echo "CREATE INDEX IF NOT EXISTS activity_aid ON activity (aid);" | sqlite3 $@
 	echo "CREATE INDEX IF NOT EXISTS targets_aid ON targets (aid);" | sqlite3 $@
 	echo "CREATE INDEX IF NOT EXISTS targets_target ON targets (target);" | sqlite3 $@
+	echo "CREATE INDEX IF NOT EXISTS targetTranslations_target ON targetTranslations (target);" | sqlite3 $@
 
 working/bioassayDatabaseWithSpecies.sqlite: src/annotateSpecies.R working/indexedBioassayDatabase.sqlite
 	cp working/indexedBioassayDatabase.sqlite $@
