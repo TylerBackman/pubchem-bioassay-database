@@ -2,9 +2,9 @@
 
 #PBS -j oe
 #PBS -l nodes=1:ppn=1
-#PBS -l mem=8gb 
+#PBS -l mem=16gb 
 #PBS -l walltime=48:00:00 
-##PBS -q highmem 
+#PBS -q highmem 
 
 cd $PBS_O_WORKDIR
 
