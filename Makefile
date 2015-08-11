@@ -119,5 +119,3 @@ working/eiDatabase: src/makeEiDatabaseParallel.R working/splitFolder
 working/indexedEiDatabase: src/indexEiDatabase.R working/eiDatabase 
 	cp -R working/eiDatabase $@		
 	$< $@ $(mpiCores)
-
-# cluster compounds
