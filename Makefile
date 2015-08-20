@@ -69,7 +69,7 @@ working/pubchemBioassay.sqlite: working/bioassayDatabaseNoDuplicates.sqlite
 working/compounds.sqlite: src/getCids.R working/bioassayDatabase.sqlite
 	$^ $@
 
-working/summarystats.txt: src/computeStats.R working/pubchemBioassay.sqlite
+working/summarystats.txt: src/computeStats.R working/pubchemBioassay.sqlite working/bioassayMirror
 	$^ $@
 
 # use kClust to cluster proteins by sequence
