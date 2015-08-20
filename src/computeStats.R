@@ -8,7 +8,7 @@ library(RSQLite)
 
 database = commandArgs(trailingOnly=TRUE)[1]
 bioassayMirror = commandArgs(trailingOnly=TRUE)[2]
-outfile = commandArgs(trailingOnly=TRUE)[2]
+outfile = commandArgs(trailingOnly=TRUE)[3]
 
 # test code for running without make:
 if(is.na(commandArgs(trailingOnly=TRUE)[1])){
