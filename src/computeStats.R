@@ -59,9 +59,11 @@ for(x in CSVpaths){
     tempAssay <- read.csv(x)[,c("PUBCHEM_CID", "PUBCHEM_ACTIVITY_OUTCOME", "PUBCHEM_ACTIVITY_SCORE")] 
     cids <- unique(tempAssay$PUBCHEM_CID)
     cids <- cids[! is.na(cids)]
-    cids <- as.character(cids)
-    for(y in cids){
-        assign(y, value="", envir=cidEnv)
+    if(is.numeric(cids)){
+        cids <- as.character(cids)
+        for(y in cids){
+            assign(y, value="", envir=cidEnv)
+        }
     }
 }
 allCids <- ls(cidEnv)
