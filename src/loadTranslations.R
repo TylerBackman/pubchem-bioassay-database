@@ -22,7 +22,7 @@ con  <- file(translations, open = "r")
 while (length(oneLine <- readLines(con, n = 1, warn = FALSE)) > 0) {
     splitLine <- strsplit(oneLine, split="\t")[[1]]
     if(splitLine[3] %in% allTargets){
-        loadTranslation(database, splitLine[3], "UniProt", splitLine[1])
+        loadIdMapping(database, splitLine[3], "UniProt", splitLine[1])
     }
 }
 close(con)
