@@ -1,5 +1,5 @@
-mpiCores = 1 
-all: working/kClust working/pubchemBioassay.sqlite working/compounds.sqlite working/summarystats.txt
+cores = 1 
+all: working/summarystats.txt
 
 clean:
 	rm -rf working/*
@@ -25,11 +25,6 @@ working/Pfam-A.hmm:
 	wget -O $@.gz ftp://ftp.sanger.ac.uk/pub/databases/Pfam/releases/Pfam27.0/Pfam-A.hmm.gz
 	gunzip $@.gz
 	hmmpress $@
-
-# download all of PubChem Compound
-working/pubchemCompoundMirror:
-	mkdir -p $@
-	wget -r -nd ftp://ftp.ncbi.nlm.nih.gov/pubchem/Compound/CURRENT-Full/SDF/ -P $@
 
 ##########################################
 # build database
@@ -83,38 +78,11 @@ working/pubchemBioassay.sqlite: working/bioassayDatabaseNoDuplicates.sqlite
 working/summarystats.txt: src/computeStats.R working/pubchemBioassay.sqlite working/bioassayMirror
 	$^ $@
 
-####################################################
-# Optionally cluster targets and compute descriptors 
-####################################################
+#############################
+# Optionally cluster targets
+#############################
 
 # use kClust to cluster proteins by sequence
 working/kClust: working/targets.fasta
 	mkdir $@
 	kClust -i $^ -d $@ -s 0.52 -M 16000MB
-
-# compute atoms pairs for all compounds in parallel on mpi cluster 
-working/ap.rda: src/make_apDatabase.sh src/computeAtomPairs.R working/pubchemCompoundMirror
-	qsub $<
-
-####################################################
-# Optionally build EI Database of compounds
-####################################################
-
-# extract active CIDs and form SDF
-working/activeCompounds.sdf: src/extractActives.R working/pubchemCompoundMirror working/bioassayDatabase.sqlite
-	$^ $@
-
-# split activeCompounds into small files to load in parallel
-working/splitFolder: working/mayachemtools/bin/SplitSDFiles.pl working/activeCompounds.sdf
-	mkdir -p $@
-	$< ../activeCompounds.sdf --numcmpds 1000 -m Cmpds -w $@ 
-
-# load compounds in parallel
-working/eiDatabase: src/makeEiDatabaseParallel.R working/splitFolder 
-	mkdir -p $@
-	$^ $@ $(mpiCores)
-
-# index EI database
-working/indexedEiDatabase: src/indexEiDatabase.R working/eiDatabase 
-	cp -R working/eiDatabase $@		
-	$< $@ $(mpiCores)
