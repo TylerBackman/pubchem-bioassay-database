@@ -9,6 +9,4 @@
 cd $PBS_O_WORKDIR
 
 export mpiCores="$PBS_NP"
-# module load R/3.2.0
-# make -e working/domainSelectivity.pdf 
-src/computeStats.R working/pubchemBioassay.sqlite working/bioassayMirror working/summarystats.txt
+make -e working/summarystats.txt
