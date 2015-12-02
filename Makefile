@@ -9,6 +9,11 @@ clean:
 # Note: all external files should go here
 ##########################################
 
+# download all of PubChem Bioassay
+working/bioassayMirror: src/mirrorBioassay.sh
+	mkdir -p $@
+	$^ $@
+	
 working/mayachemtools/bin/SplitSDFiles.pl:
 	wget http://www.mayachemtools.org/download/mayachemtools.tar.gz -O working/mayachemtools.tar.gz
 	tar xvfz working/mayachemtools.tar.gz -C working/
@@ -34,10 +39,6 @@ working/Pfam-A.hmm:
 working/gi_uniprot_mapping.dat: working/uniprot_id_mapping.dat.gz
 	zcat $< | awk '{if ($$2 == "GI") print $$0;}' > $@
 
-working/bioassayMirror: src/mirrorBioassay.sh
-	mkdir -p $@
-	$^ $@
-	
 working/bioassayDatabase.sqlite: src/buildBioassayDatabase.R working/bioassayMirror
 	$^ proteinsOnly $@
 
