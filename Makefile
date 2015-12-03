@@ -13,19 +13,17 @@ clean:
 working/bioassayMirror: src/mirrorBioassay.sh
 	mkdir -p $@
 	$^ $@
-	
-working/mayachemtools/bin/SplitSDFiles.pl:
-	wget http://www.mayachemtools.org/download/mayachemtools.tar.gz -O working/mayachemtools.tar.gz
-	tar xvfz working/mayachemtools.tar.gz -C working/
 
 # download uniprot ID mappings
 working/uniprot_id_mapping.dat.gz:
 	mkdir -p working
 	wget ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/idmapping.dat.gz -O $@
 
+# download protein target sequences
 working/targets.fasta: working/bioassayDatabase.sqlite
 	echo "SELECT DISTINCT target FROM targets WHERE target_type = \"protein\";" | sqlite3 $< | xargs -I '{}' wget -O - "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id={}&rettype=fasta&retmode=text" >> $@
 
+# download Pfam HMM data
 working/Pfam-A.hmm:
 	wget -O $@.gz ftp://ftp.sanger.ac.uk/pub/databases/Pfam/releases/Pfam27.0/Pfam-A.hmm.gz
 	gunzip $@.gz
@@ -43,7 +41,7 @@ working/bioassayDatabase.sqlite: src/buildBioassayDatabase.R working/bioassayMir
 	$^ proteinsOnly $@
 
 working/domainsFromHmmscan: working/Pfam-A.hmm working/targets.fasta
-	hmmscan --tblout working/domainsFromHmmscan --cpu 8 --noali $^
+	hmmscan --tblout working/domainsFromHmmscan --cpu $(cores) --noali $^
 
 working/domainsFromHmmscanTwoCols: working/domainsFromHmmscan
 	awk '{print $$2 " " $$3}' $^ > $@
