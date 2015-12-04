@@ -2,7 +2,7 @@
 
 #PBS -j oe
 #PBS -l walltime=48:00:00
-#PBS -l nodes=1:ppn=2
+#PBS -l nodes=1:ppn=8
 #PBS -l mem=64gb
 ##PBS -q highmem
 

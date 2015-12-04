@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
-# (C) 2013-2014 Tyler WH Backman
-# Purpose: build a bioassay SQLite database from a downloaded mirror
+# (C) Tyler WH Backman
+# Purpose: build a PubChem BioAssay SQLite database from a downloaded CSV mirror
 
 library(R.utils)
 library(bioassayR)
@@ -12,7 +12,7 @@ outputDatabase <- commandArgs(trailingOnly=TRUE)[3]
 
 # test code for running without make:
 if(is.na(commandArgs(trailingOnly=TRUE)[1])){
-	bioassayMirror <- "working/bioassayMirror_test"
+	bioassayMirror <- "working/bioassayMirror"
     targetType <- "proteinsOnly"
 	outputDatabase <- "working/bioassayDatabase.sqlite"
 }
@@ -59,15 +59,15 @@ CSVpaths <- CSVpaths[match(CSVaids, XMLaids)]
 CSVaids <- CSVaids[match(CSVaids, XMLaids)]
 
 # add data source
-addDataSource(database, "PubChem Bioassay", format(Sys.time(), "%b %d %Y"))
+addDataSource(database, "PubChem BioAssay", format(Sys.time(), "%b %d %Y"))
 
 # loop through assay files and load them into the database
 mapply(function(aid, csvFile, XMLFile){
-        print(paste("attempting to load assay:", aid))
+        print(paste("loading assay:", aid))
         assay <- parsePubChemBioassay(aid, csvFile, XMLFile)
         
         if(nrow(scores(assay)) < 1){
-            print(paste("not inserting empty assay:", aid))
+            print(paste("skipping empty assay:", aid))
             return() 
         }
         if(! FALSE %in% (is.na(scores(assay)$activity))){
@@ -75,6 +75,7 @@ mapply(function(aid, csvFile, XMLFile){
             return() 
         }
         if((targetType == "proteinsOnly") && is.na(targets(assay))){
+            print(paste("skipping assay without a defined target:", aid))
             return()
         }
         loadBioassay(database, assay)
