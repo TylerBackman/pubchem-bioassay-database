@@ -8,6 +8,6 @@
 
 cd $PBS_O_WORKDIR
 
-export mpiCores="$PBS_NP"
+export cores="$PBS_NP"
 module load R/3.2.2 
 make -e working/summarystats.txt
