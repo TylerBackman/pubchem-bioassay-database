@@ -63,6 +63,7 @@ addDataSource(database, "PubChem Bioassay", format(Sys.time(), "%b %d %Y"))
 
 # loop through assay files and load them into the database
 mapply(function(aid, csvFile, XMLFile){
+        print(paste("attempting to load assay:", aid))
         assay <- parsePubChemBioassay(aid, csvFile, XMLFile)
         
         if(nrow(scores(assay)) < 1){
