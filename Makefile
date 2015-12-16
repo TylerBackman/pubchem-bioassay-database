@@ -25,7 +25,7 @@ working/targets.fasta: working/bioassayDatabase.sqlite
 
 # download Pfam HMM data
 working/Pfam-A.hmm:
-	wget -O $@.gz ftp://ftp.sanger.ac.uk/pub/databases/Pfam/releases/Pfam27.0/Pfam-A.hmm.gz
+	wget -O $@.gz ftp://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam29.0/Pfam-A.hmm.gz
 	gunzip $@.gz
 	hmmpress $@
 
