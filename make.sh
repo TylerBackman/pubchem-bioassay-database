@@ -10,4 +10,5 @@ cd $PBS_O_WORKDIR
 
 export cores="$PBS_NP"
 module load R/3.2.2 
+module load hmmer/3.1b2
 make -e working/summarystats.txt
