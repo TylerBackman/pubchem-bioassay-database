@@ -29,6 +29,11 @@ working/Pfam-A.hmm:
 	gunzip $@.gz
 	hmmpress $@
 
+# download kClust linux binary
+working/kClust:
+	wget -O $@ ftp://toolkit.lmb.uni-muenchen.de/pub/kClust/kClust
+	chmod u+x $@
+
 ##########################################
 # build database
 ##########################################
@@ -54,10 +59,15 @@ working/bioassayDatabaseWithDomains.sqlite: src/loadDomainData.R working/targets
 	cp working/bioassayDatabase.sqlite $@
 	src/loadDomainData.R working/targets.fasta working/domainsFromHmmscanTwoCols $@
 
+# use kClust to cluster proteins by sequence
+working/targetClusters: working/kClust working/targets.fasta
+	mkdir $@ 
+	$< -i working/targets.fasta -d $@ -s 0.52 -M 16000MB
+
 # load UniProt mappings into database
-working/databaseWithTargetTranslations.sqlite: src/loadTranslations.R working/bioassayDatabaseWithDomains.sqlite working/gi_uniprot_mapping.dat
+working/databaseWithTargetTranslations.sqlite: src/loadTranslations.R working/bioassayDatabaseWithDomains.sqlite working/gi_uniprot_mapping.dat working/targetClusters
 	cp working/bioassayDatabaseWithDomains.sqlite $@
-	$< working/gi_uniprot_mapping.dat $@
+	$< working/gi_uniprot_mapping.dat working/targetClusters $@
 
 # turn on indexing
 working/indexedBioassayDatabase.sqlite: working/databaseWithTargetTranslations.sqlite 
@@ -73,25 +83,10 @@ working/bioassayDatabaseWithSpecies.sqlite: src/annotateSpecies.R working/indexe
 	cp working/indexedBioassayDatabase.sqlite $@
 	$< $@
 
-# remove duplicate aid/cid combinations
-working/bioassayDatabaseNoDuplicates.sqlite: working/bioassayDatabaseWithSpecies.sqlite
-	cp $< /dev/shm/bioassayDatabaseNoDuplicates.sqlite
-	echo "DELETE FROM activity WHERE rowid NOT IN (SELECT min(rowid) FROM activity GROUP BY aid, cid);" | sqlite3 /dev/shm/bioassayDatabaseNoDuplicates.sqlite
-	mv /dev/shm/bioassayDatabaseNoDuplicates.sqlite $@
-
 # create symbolic link to final database file
-working/pubchemBioassay.sqlite: working/bioassayDatabaseNoDuplicates.sqlite 
+working/pubchemBioassay.sqlite: working/bioassayDatabaseWithSpecies.sqlite 
 	ln -s bioassayDatabaseNoDuplicates.sqlite $@ 
 
 # summarize database contents in a text file
 working/summarystats.txt: src/computeStats.R working/pubchemBioassay.sqlite working/bioassayMirror
 	$^ $@
-
-#############################
-# Optionally cluster targets
-#############################
-
-# use kClust to cluster proteins by sequence
-working/kClust: working/targets.fasta
-	mkdir $@
-	kClust -i $^ -d $@ -s 0.52 -M 16000MB
