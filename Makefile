@@ -81,7 +81,7 @@ working/bioassayDatabaseWithSpecies.sqlite: src/annotateSpecies.R working/indexe
 
 # create symbolic link to final database file
 working/pubchemBioassay.sqlite: working/bioassayDatabaseWithSpecies.sqlite 
-	ln -s bioassayDatabaseNoDuplicates.sqlite $@ 
+	ln -s $< $@ 
 
 # summarize database contents in a text file
 working/summarystats.txt: src/computeStats.R working/pubchemBioassay.sqlite working/bioassayMirror
