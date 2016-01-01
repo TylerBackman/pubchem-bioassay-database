@@ -70,13 +70,9 @@ working/databaseWithTargetTranslations.sqlite: src/loadTranslations.R working/bi
 	$< working/gi_uniprot_mapping.dat working/targetClusters $@
 
 # turn on indexing
-working/indexedBioassayDatabase.sqlite: working/databaseWithTargetTranslations.sqlite 
-	cp $< $@
-	echo "CREATE INDEX IF NOT EXISTS activity_cid ON activity (cid);" | sqlite3 $@
-	echo "CREATE INDEX IF NOT EXISTS activity_aid ON activity (aid);" | sqlite3 $@
-	echo "CREATE INDEX IF NOT EXISTS targets_aid ON targets (aid);" | sqlite3 $@
-	echo "CREATE INDEX IF NOT EXISTS targets_target ON targets (target);" | sqlite3 $@
-	echo "CREATE INDEX IF NOT EXISTS targetTranslations_target ON targetTranslations (target);" | sqlite3 $@
+working/indexedBioassayDatabase.sqlite: src/indexDatabase.R working/databaseWithTargetTranslations.sqlite 
+	cp working/databaseWithTargetTranslations.sqlite $@
+	$< $@
 
 # load species annotations for assays
 working/bioassayDatabaseWithSpecies.sqlite: src/annotateSpecies.R working/indexedBioassayDatabase.sqlite
