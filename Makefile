@@ -52,22 +52,17 @@ working/domainsFromHmmscan: working/Pfam-A.hmm working/targets.fasta
 
 # extract domains from HMM results
 working/domainsFromHmmscanTwoCols: working/domainsFromHmmscan
-	awk '{print $$2 " " $$3}' $^ > $@
-
-# load domain data into database
-working/bioassayDatabaseWithDomains.sqlite: src/loadDomainData.R working/targets.fasta working/domainsFromHmmscanTwoCols working/bioassayDatabase.sqlite
-	cp working/bioassayDatabase.sqlite $@
-	src/loadDomainData.R working/targets.fasta working/domainsFromHmmscanTwoCols $@
+	awk '{ if (!/^#/) print $$2 " " $$3}' $^ > $@
 
 # use kClust to cluster proteins by sequence
 working/targetClusters: working/kClust working/targets.fasta
 	mkdir $@ 
 	$< -i working/targets.fasta -d $@ -s 0.52 -M 16000MB
 
-# load UniProt mappings into database
-working/databaseWithTargetTranslations.sqlite: src/loadTranslations.R working/bioassayDatabaseWithDomains.sqlite working/gi_uniprot_mapping.dat working/targetClusters
+# load target annotations into database
+working/databaseWithTargetTranslations.sqlite: src/loadTranslations.R working/bioassayDatabase.sqlite working/gi_uniprot_mapping.dat working/targetClusters working/domainsFromHmmscanTwoCols
 	cp working/bioassayDatabaseWithDomains.sqlite $@
-	$< working/gi_uniprot_mapping.dat working/targetClusters $@
+	$< working/gi_uniprot_mapping.dat working/targetClusters working/domainsFromHmmscanTwoCols $@
 
 # turn on indexing
 working/indexedBioassayDatabase.sqlite: src/indexDatabase.R working/databaseWithTargetTranslations.sqlite 
