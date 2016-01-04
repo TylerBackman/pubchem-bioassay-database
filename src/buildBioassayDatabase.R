@@ -74,7 +74,7 @@ mapply(function(aid, csvFile, XMLFile){
             print(paste("skipping assay without activity:", aid))
             return() 
         }
-        if((targetType == "proteinsOnly") && ("protein" %in% target_types(assay))){
+        if((targetType == "proteinsOnly") && !("protein" %in% target_types(assay))){
             print(paste("skipping assay without a protein target:", aid))
             return()
         }
