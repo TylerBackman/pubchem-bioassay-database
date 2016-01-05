@@ -61,7 +61,7 @@ working/targetClusters: working/kClust working/targets.fasta
 
 # load target annotations into database
 working/databaseWithTargetTranslations.sqlite: src/loadTranslations.R working/bioassayDatabase.sqlite working/gi_uniprot_mapping.dat working/targetClusters working/domainsFromHmmscanTwoCols
-	cp working/bioassayDatabaseWithDomains.sqlite $@
+	cp working/bioassayDatabase.sqlite $@
 	$< working/gi_uniprot_mapping.dat working/targetClusters working/domainsFromHmmscanTwoCols $@
 
 # turn on indexing
