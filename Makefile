@@ -81,3 +81,7 @@ working/pubchemBioassay.sqlite: working/bioassayDatabaseWithSpecies.sqlite
 # summarize database contents in a text file
 working/summarystats.txt: src/computeStats.R working/pubchemBioassay.sqlite working/bioassayMirror
 	$^ $@
+
+# optionally build a small sample database for the bioassayR vignette
+working/sampleDatabase.sqlite: src/sampleDatabase.R working/pubchemBioassay.sqlite
+	$^ $@
