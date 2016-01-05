@@ -25,7 +25,6 @@ queries <- c(
     "select COUNT(DISTINCT aid) from targets WHERE target_type = 'protein'",
     "select COUNT(DISTINCT cid) from activity",
     "SELECT COUNT(DISTINCT target) FROM targets WHERE target_type = 'protein'",
-    "SELECT COUNT(DISTINCT domain) FROM domains",
     "SELECT assay_type, COUNT(*) FROM assays GROUP BY assay_type"
 )
 
