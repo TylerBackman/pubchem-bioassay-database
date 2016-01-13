@@ -28,15 +28,15 @@ queries <- c(
     "SELECT assay_type, COUNT(*) FROM assays GROUP BY assay_type"
 )
 
-## run queries on database
-#drv <- dbDriver("SQLite")
-#con <- dbConnect(drv, dbname=database)
-#outfilehandle <- file(outfile, "wb")
-#lapply(queries, function(x){
-#    writeLines(x, outfilehandle)
-#    write.table(dbGetQuery(con,x), file=outfilehandle, append=T, row.names = F)
-#})
-#dbDisconnect(con)
+# run queries on database
+drv <- dbDriver("SQLite")
+con <- dbConnect(drv, dbname=database)
+outfilehandle <- file(outfile, "wb")
+lapply(queries, function(x){
+    writeLines(x, outfilehandle)
+    write.table(dbGetQuery(con,x), file=outfilehandle, append=T, row.names = F)
+})
+dbDisconnect(con)
 #
 ## this function returns the path of each assay file within a given folder name
 #getAssayPaths <- function(path) {
