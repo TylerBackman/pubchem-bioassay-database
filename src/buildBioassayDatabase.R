@@ -31,7 +31,7 @@ getAssayPaths <- function(path) {
 # cp -a bioassayMirror/Data/0575001_0576000/57511* bioassayMirror_test/Data/0575001_0576000/
 # mkdir -p bioassayMirror_test/Description/0575001_0576000/
 # cp -a bioassayMirror/Description/0575001_0576000/57511* bioassayMirror_test/Description/0575001_0576000/
-# rm bioassayMirror_test/Data/0575001_0576000/575111.concise.csv.gz
+# rm bioassayMirror_test/Data/0575001_0576000/575111.csv.gz
 # rm bioassayMirror_test/Description/0575001_0576000/575115.concise.descr.xml.gz
 
 # create database and connect to it
@@ -39,13 +39,13 @@ database <- newBioassayDB(outputDatabase, writeable = TRUE, indexed = FALSE)
 
 # get paths for csv files 
 CSVpaths <- getAssayPaths(file.path(bioassayMirror, "Data"))
-CSVaids <- as.integer(gsub("^.*?(\\d+)\\.concise\\.csv.*$", "\\1", CSVpaths, perl = TRUE))
+CSVaids <- as.integer(gsub("^.*?(\\d+)\\.csv.*$", "\\1", CSVpaths, perl = TRUE))
 CSVpaths <- CSVpaths[! duplicated(CSVaids)]
 CSVaids <- CSVaids[! duplicated(CSVaids)]
 
 # get paths for XML files
 XMLpaths <- getAssayPaths(file.path(bioassayMirror, "Description"))
-XMLaids <- as.integer(gsub("^.*?(\\d+)\\.concise.descr\\.xml.*$", "\\1", XMLpaths, perl = TRUE))
+XMLaids <- as.integer(gsub("^.*?(\\d+)\\.descr\\.xml.*$", "\\1", XMLpaths, perl = TRUE))
 XMLpaths <- XMLpaths[! duplicated(XMLpaths)]
 XMLaids <- XMLaids[! duplicated(XMLpaths)]
 
