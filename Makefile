@@ -82,6 +82,10 @@ working/pubchemBioassay.sqlite: working/bioassayDatabaseWithSpecies.sqlite
 working/summarystats.txt: src/computeStats.R working/pubchemBioassay.sqlite working/bioassayMirror
 	$^ $@
 
+# Enumerate PubChem BioAssay CSV header columns (score categories)
+working/scoreCategories.txt: src/enumerateScoreCategories.R working/bioassayMirror
+	$^ $@
+
 # optionally build a small sample database for the bioassayR vignette
 working/sampleDatabase.sqlite: src/sampleDatabase.R working/pubchemBioassay.sqlite
 	$^ $@
