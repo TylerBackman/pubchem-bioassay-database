@@ -5,7 +5,6 @@
 # for the full archive
 
 library(R.utils)
-library(bioassayR)
 
 bioassayMirror <- commandArgs(trailingOnly=TRUE)[1]
 outputFilename <- commandArgs(trailingOnly=TRUE)[2]
