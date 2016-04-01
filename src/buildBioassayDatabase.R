@@ -59,7 +59,7 @@ CSVpaths <- CSVpaths[match(CSVaids, XMLaids)]
 CSVaids <- CSVaids[match(CSVaids, XMLaids)]
 
 # test code to save parse results for debugging
-save(list = ls(all=TRUE), file = "working/parsedPaths.R")
+save(list = ls(all=TRUE), file = "working/parsedPaths.RData")
 
 # add data source
 addDataSource(database, "PubChem BioAssay", format(Sys.time(), "%b %d %Y"))
