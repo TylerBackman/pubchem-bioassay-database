@@ -58,6 +58,9 @@ XMLaids <- XMLaids[XMLaids %in% intersection]
 CSVpaths <- CSVpaths[match(CSVaids, XMLaids)]
 CSVaids <- CSVaids[match(CSVaids, XMLaids)]
 
+# test code to save parse results for debugging
+save(list = ls(all=TRUE), file = "working/parsedPaths.R")
+
 # add data source
 addDataSource(database, "PubChem BioAssay", format(Sys.time(), "%b %d %Y"))
 
