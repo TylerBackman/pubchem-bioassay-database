@@ -30,9 +30,9 @@ working/Pfam-A.hmm:
 	hmmpress $@
 
 # download kClust linux binary
-working/kClust:
-	wget -O $@ ftp://toolkit.lmb.uni-muenchen.de/pub/kClust/kClust
-	chmod u+x $@
+# working/kClust:
+#	wget -O $@ ftp://toolkit.lmb.uni-muenchen.de/pub/kClust/kClust
+#	chmod u+x $@
 
 ##########################################
 # build database
@@ -55,7 +55,7 @@ working/domainsFromHmmscanTwoCols: working/domainsFromHmmscan
 	awk '{ if (!/^#/) print $$2 " " $$3}' $^ > $@
 
 # use kClust to cluster proteins by sequence
-working/targetClusters: working/kClust working/targets.fasta
+working/targetClusters: src/kClust working/targets.fasta
 	mkdir $@ 
 	$< -i working/targets.fasta -d $@ -s 0.52 -M 16000MB
 
