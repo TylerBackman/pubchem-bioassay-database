@@ -48,7 +48,7 @@ working/bioassayDatabase.sqlite: src/buildBioassayDatabase.R working/bioassayMir
 
 # compute target HMMs
 working/domainsFromHmmscan: working/Pfam-A.hmm working/targets.fasta
-	hmmscan --tblout working/domainsFromHmmscan --cpu $(cores) --noali $^
+	hmmscan -E 0.01 --domE 0.01 --tblout working/domainsFromHmmscan --cpu $(cores) --noali $^
 
 # extract domains from HMM results
 working/domainsFromHmmscanTwoCols: working/domainsFromHmmscan
