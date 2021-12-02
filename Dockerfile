@@ -5,6 +5,6 @@ RUN Rscript --vanilla -e "options(repos = c(CRAN = 'https://cran.r-project.org')
 # Install required Bioconductor packages from devel version
 RUN Rscript -e 'BiocManager::install("bioassayR")'
 RUN Rscript -e 'install.packages("R.utils")'
-RUN apt-get update && apt-get install -y hmmer && apt-get instal -y sqlite3
+RUN apt-get update && apt-get install -y hmmer && apt-get install -y sqlite3
 ADD . /pubchem-bioassay-database
 RUN cd /pubchem-bioassay-database && make working/summarystats.txt
