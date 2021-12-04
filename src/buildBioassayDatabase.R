@@ -11,7 +11,7 @@ targetType <- commandArgs(trailingOnly=TRUE)[2]
 outputDatabase <- commandArgs(trailingOnly=TRUE)[3]
 
 # test code for running without make:
-if(is.na(commandArgs(trailingOnly=TRUE)[1])){
+if(is.null(commandArgs(trailingOnly=TRUE)[1])){
 	bioassayMirror <- "working/bioassayMirror"
     targetType <- "proteinsOnly"
 	outputDatabase <- "working/bioassayDatabase.sqlite"
